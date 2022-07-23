@@ -1,0 +1,70 @@
+# Logs
+logs
+*.log
+pnpm-debug.log*
+pnpm-error.log*
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Coverage directory used by tools like istanbul
+coverage
+
+# Dependency directories
+node_modules/
+**/node_modules/
+jspm_packages/
+
+# Build files
+dist
+dist-types
+dist-ssr
+dist-docs
+*.local
+.yalc
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Output of 'npm pack'
+*.tgz
+
+# Optional npm cache directory
+.npm
+
+# CI Pnpm cache
+.pnpm-store/
+
+# parcel-bundler cache (https://parceljs.org/)
+.cache
+
+# next.js build output
+.next
+
+# nuxt.js build output
+.nuxt
+
+# vuepress build output
+.vuepress/dist
+.vitepress/dist
+
+
+# We are using pnpm
+.yarn/
+.yarnrc
+yarn.lock
+**/yarn.lock
+package-lock.json
+**/package-lock.json
+
+# Editor backup files
+./**/.vscode
+

@@ -1,0 +1,15 @@
+.yarn/
+**/node_modules/
+**/dist/
+**/dist-ssr/
+**/dist-client/
+**/dist-docs/
+**/lib/
+**/build/
+**/public/
+**/static/
+**/.cache/
+**/coverage/
+.pnp.js
+.pnp.cjs
+.next/
