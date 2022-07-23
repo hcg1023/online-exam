@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-	"baseUrl": ".",
+    "baseUrl": ".",
     "target": "esnext",
     "useDefineForClassFields": true,
     "module": "esnext",
@@ -11,8 +11,13 @@
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "lib": ["esnext", "dom"],
-	"types": []
+    "types": []
   },
-  "include": ["packages/**/src/**/*.ts", "packages/**/test/**/*.ts", "packages/**/src/**/*.vue", "packages/**/src/**/*.tsx"],
+  "include": [
+    "packages/**/src/**/*.ts",
+    "packages/**/test/**/*.ts",
+    "packages/**/src/**/*.vue",
+    "packages/**/src/**/*.tsx"
+  ],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

@@ -1,22 +1,37 @@
 {
   "rules": {
-	"color-no-invalid-hex": true,
-	"block-no-empty": true,
-	"selector-pseudo-class-no-unknown": [true, {
-	  "ignorePseudoClasses": ["global"]
-	}]
+    "color-no-invalid-hex": true,
+    "block-no-empty": true,
+    "selector-pseudo-class-no-unknown": [
+      true,
+      {
+        "ignorePseudoClasses": ["global"]
+      }
+    ]
   },
-  "extends": ["stylelint-config-standard", "stylelint-config-rational-order", "stylelint-config-prettier"],
+  "extends": [
+    "stylelint-config-standard",
+    "stylelint-config-rational-order",
+    "stylelint-config-prettier"
+  ],
   "plugins": ["stylelint-order"],
   "overrides": [
-	{
-	  "files": ["**/*.less", "**/\\.vitepress/**/*.less", "**/\\.vuepress/**/*.less"],
-	  "customSyntax": "postcss-less",
-	  "plugins": ["stylelint-less", "stylelint-order"]
-	},
-	{
-	  "files": ["**/*.{vue,html}",  "**/\\.vitepress/**/*.vue", "**/\\.vuepress/**/*.vue"],
-	  "customSyntax": "postcss-html"
-	}
+    {
+      "files": [
+        "**/*.less",
+        "**/\\.vitepress/**/*.less",
+        "**/\\.vuepress/**/*.less"
+      ],
+      "customSyntax": "postcss-less",
+      "plugins": ["stylelint-less", "stylelint-order"]
+    },
+    {
+      "files": [
+        "**/*.{vue,html}",
+        "**/\\.vitepress/**/*.vue",
+        "**/\\.vuepress/**/*.vue"
+      ],
+      "customSyntax": "postcss-html"
+    }
   ]
 }
