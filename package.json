@@ -4,6 +4,8 @@
   "version": "0.0.0",
   "description": "monorepo template",
   "scripts": {
+    "dev:backend": "pnpm -r --filter=backend start:dev",
+    "dev:frontend": "pnpm -r --filter=frontend dev",
     "preinstall": "npx only-allow pnpm",
     "prepare": "husky install",
     "test": "vitest --run --passWithNoTests",
@@ -22,10 +24,10 @@
   "author": "hcg1023 <2293885211@qq.com>",
   "repository": {
     "type": "git",
-    "url": "https://github.com/hcg1023/monorepo-template"
+    "url": "https://github.com/hcg1023/online-exam"
   },
-  "homepage": "https://github.com/hcg1023/monorepo-template/",
-  "bugs": "https://github.com/hcg1023/monorepo-template/issues",
+  "homepage": "https://github.com/hcg1023/online-exam/",
+  "bugs": "https://github.com/hcg1023/online-exam/issues",
   "license": "MIT",
   "keywords": [],
   "devDependencies": {

@@ -3,9 +3,9 @@ name: changesets-release
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
 env:
-  BASE_URL: /monorepo-template
-  BUILD_PACKAGE_NAME: "web"
-  PUBLISH_DIR: ./packages/web/dist
+  BASE_URL: /online-exam
+  BUILD_PACKAGE_NAME: 'frontend'
+  PUBLISH_DIR: ./packages/frontend/dist
 
 on:
   workflow_run:

@@ -1,9 +1,9 @@
 name: deploy-web
 
 env:
-  BASE_URL: /monorepo-template
-  BUILD_PACKAGE_NAME: 'web'
-  PUBLISH_DIR: ./packages/web/dist
+  BASE_URL: /online-exam
+  BUILD_PACKAGE_NAME: 'frontend'
+  PUBLISH_DIR: ./packages/frontend/dist
 
 # 手动触发，不需要自动部署
 # 自动部署的时机是在publish之后

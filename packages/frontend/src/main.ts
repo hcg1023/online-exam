@@ -1,7 +1,18 @@
 import { createApp } from 'vue'
-// main.ts
-import 'uno.css'
-import './style.css'
+import { setupLayouts } from 'virtual:generated-layouts'
 import App from './App.vue'
+import generatedRoutes from '~pages'
+import { createRouter, createWebHistory } from 'vue-router'
 
-createApp(App).mount('#app')
+import '@unocss/reset/normalize.css'
+import 'uno.css'
+import '~/assets/styles/index.less'
+
+const routes = setupLayouts(generatedRoutes)
+
+const router = createRouter({
+  history: createWebHistory(),
+  routes,
+})
+
+createApp(App).use(router).mount('#app')
