@@ -1,9 +1,9 @@
-import { PartialType } from '@nestjs/mapped-types';
 import { CreateUserDto } from './create-user.dto';
+import { ApiProperty, PartialType } from '@nestjs/swagger';
+import { IsNotEmpty } from 'class-validator';
 
 export class UpdateUserDto extends PartialType(CreateUserDto) {
-  id: string;
+  @ApiProperty()
+  @IsNotEmpty()
+  id: number;
 }
-
-const user = new UpdateUserDto();
-user.password = '123';
