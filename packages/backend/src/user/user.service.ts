@@ -6,8 +6,9 @@ import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
 import { Password } from './entities/password.entity';
 import { FindOptionsWhere } from 'typeorm/find-options/FindOptionsWhere';
-import { UserVo } from './vo/user.vo';
+import { ViewUserDto } from './dto/view-user.dto';
 import { encrypt } from '../common/bcrypt';
+import { User as UserDecorator } from '../auth/user.decorator';
 
 @Injectable()
 export class UserService {
@@ -30,7 +31,7 @@ export class UserService {
       ...createUserDto,
       password,
     });
-    const result = new UserVo();
+    const result = new ViewUserDto();
     result.id = user.id;
     result.username = user.username;
     result.identity = user.identity;
@@ -45,11 +46,11 @@ export class UserService {
   findOne<T extends boolean | undefined>(
     username: string,
     forcePassword?: T,
-  ): Promise<T extends true ? User : UserVo>;
+  ): Promise<T extends true ? User : ViewUserDto>;
   findOne<T extends boolean | undefined>(
     id: number,
     forcePassword?: T,
-  ): Promise<T extends true ? User : UserVo>;
+  ): Promise<T extends true ? User : ViewUserDto>;
   async findOne(
     idOrName: number | string,
     forcePassword = false,

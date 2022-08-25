@@ -1,12 +1,19 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Roles } from '../role/role.decorator';
 import { IdentityEnum } from '@online-exam/contants';
 import { User } from '../auth/user.decorator';
-import { UserVo } from './vo/user.vo';
+import { ViewUserDto } from './dto/view-user.dto';
 
 @ApiBearerAuth()
 @ApiTags('User')
@@ -16,7 +23,17 @@ export class UserController {
 
   @Roles(IdentityEnum.ADMIN, IdentityEnum.TEACHER)
   @Post('create')
-  create(@Body() createUserDto: CreateUserDto, @User() user: UserVo) {
+  @ApiResponse({
+    status: 200,
+    type: ViewUserDto,
+  })
+  create(@Body() createUserDto: CreateUserDto, @User() user: ViewUserDto) {
+    if (
+      user.identity === IdentityEnum.TEACHER &&
+      createUserDto.identity !== IdentityEnum.STUDENT
+    ) {
+      throw new UnauthorizedException();
+    }
     return this.userService.create(createUserDto);
   }
 

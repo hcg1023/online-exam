@@ -5,6 +5,11 @@ import { UserModule } from './user/user.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
 import { RoleModule } from './role/role.module';
+import { TestPaperModule } from './test-paper/test-paper.module';
+import { QuestionModule } from './question/question.module';
+import { ClassInfoModule } from './class-info/class-info.module';
+import { SujectModule } from './subject/suject.module';
+import { SubjectModule } from './subject/subject.module';
 
 @Module({
   imports: [
@@ -21,6 +26,11 @@ import { RoleModule } from './role/role.module';
     UserModule,
     AuthModule,
     RoleModule,
+    TestPaperModule,
+    QuestionModule,
+    ClassInfoModule,
+    SujectModule,
+    SubjectModule,
   ],
   controllers: [AppController],
   providers: [AppService],
