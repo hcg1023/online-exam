@@ -8,8 +8,10 @@ import { RoleModule } from './role/role.module';
 import { TestPaperModule } from './test-paper/test-paper.module';
 import { QuestionModule } from './question/question.module';
 import { ClassInfoModule } from './class-info/class-info.module';
-import { SujectModule } from './subject/suject.module';
 import { SubjectModule } from './subject/subject.module';
+import { GradeModule } from './grade/grade.module';
+import { TaskModule } from './task/task.module';
+import { AnswerModule } from './answer/answer.module';
 
 @Module({
   imports: [
@@ -29,8 +31,10 @@ import { SubjectModule } from './subject/subject.module';
     TestPaperModule,
     QuestionModule,
     ClassInfoModule,
-    SujectModule,
     SubjectModule,
+    GradeModule,
+    TaskModule,
+    AnswerModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -5,12 +5,13 @@ import {
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
+  JoinTable,
 } from 'typeorm';
-import { JoinTable } from 'typeorm/browser';
 import { QuestionGroup } from './question-group.entity';
 import { User } from '../../user/entities/user.entity';
 import { ClassInfo } from '../../class-info/entities/class-info.entity';
 import { Subject } from '../../subject/entities/subject.entity';
+import { Answer } from '../../answer/entities/answer.entity';
 
 @Entity()
 export class TestPaper {
@@ -33,7 +34,13 @@ export class TestPaper {
   @JoinTable()
   questionGroups: QuestionGroup[];
 
+  @OneToMany(() => Answer, (answer) => answer.testPaper)
+  answers: Answer[];
+
   // 允许多个试卷对应一个创建人
   @ManyToOne(() => User)
   createdUser: User;
+
+  @Column()
+  minute: number;
 }
