@@ -6,6 +6,8 @@
   "scripts": {
     "dev:backend": "pnpm -r --filter=backend start:dev",
     "dev:frontend": "pnpm -r --filter=frontend dev",
+    "dev:management": "pnpm -r --filter=management dev",
+    "build:management": "pnpm -r --filter=management build",
     "debug:backend": "pnpm -r --filter=backend start:debug",
     "preinstall": "npx only-allow pnpm",
     "prepare": "husky install",
