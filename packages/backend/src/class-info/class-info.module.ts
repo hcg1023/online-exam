@@ -8,5 +8,6 @@ import { ClassInfo } from './entities/class-info.entity';
   imports: [TypeOrmModule.forFeature([ClassInfo])],
   controllers: [ClassInfoController],
   providers: [ClassInfoService],
+  exports: [ClassInfoService],
 })
 export class ClassInfoModule {}

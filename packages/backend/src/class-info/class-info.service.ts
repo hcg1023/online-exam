@@ -12,7 +12,7 @@ export class ClassInfoService {
     return `This action returns all classInfo`;
   }
 
-  findOne(id: number) {
+  findOne(id: string) {
     return `This action returns a #${id} classInfo`;
   }
 

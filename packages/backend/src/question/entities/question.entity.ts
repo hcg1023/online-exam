@@ -5,7 +5,7 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { QuestionTypeEnum } from '@online-exam/contants';
+import { QuestionTypeEnum } from '../../enums';
 import { QuestionGroup } from '../../test-paper/entities/question-group.entity';
 import { Subject } from '../../subject/entities/subject.entity';
 import { Grade } from '../../grade/entities/grade.entity';

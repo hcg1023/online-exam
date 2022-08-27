@@ -1,4 +1,9 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import {
+  ClassSerializerInterceptor,
+  HttpException,
+  Injectable,
+  UseInterceptors,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -6,13 +11,16 @@ import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
 import { Password } from './entities/password.entity';
 import { FindOptionsWhere } from 'typeorm/find-options/FindOptionsWhere';
-import { ViewUserDto } from './dto/view-user.dto';
 import { encrypt } from '../common/bcrypt';
-import { User as UserDecorator } from '../auth/user.decorator';
+import { GradeService } from '../grade/grade.service';
+import { ClassInfoService } from '../class-info/class-info.service';
+import { UserVO } from './entities/user.vo.entity';
 
 @Injectable()
 export class UserService {
   constructor(
+    private gradeService: GradeService,
+    private classInfoService: ClassInfoService,
     @InjectRepository(User)
     private usersRepository: Repository<User>,
     @InjectRepository(Password)
@@ -29,32 +37,25 @@ export class UserService {
     });
     const user = await this.usersRepository.save({
       ...createUserDto,
+      grade: {
+        id: createUserDto.grade,
+      },
+      classInfo: {
+        id: createUserDto.classInfo,
+      },
+      createdUser: {
+        id: createUserDto.createdUser,
+      },
       password,
     });
-    const result = new ViewUserDto();
-    result.id = user.id;
-    result.username = user.username;
-    result.identity = user.identity;
-    return result;
+    return user;
   }
 
   async findAll() {
-    const all = await this.usersRepository.find();
-    return all;
+    return this.usersRepository.find();
   }
 
-  findOne<T extends boolean | undefined>(
-    username: string,
-    forcePassword?: T,
-  ): Promise<T extends true ? User : ViewUserDto>;
-  findOne<T extends boolean | undefined>(
-    id: number,
-    forcePassword?: T,
-  ): Promise<T extends true ? User : ViewUserDto>;
-  async findOne(
-    idOrName: number | string,
-    forcePassword = false,
-  ): Promise<any> {
+  async findOne(idOrName: number | string): Promise<UserVO> {
     const where: FindOptionsWhere<User> = {};
     if (typeof idOrName === 'string') {
       where.username = idOrName;
@@ -63,17 +64,44 @@ export class UserService {
     }
     const user = await this.usersRepository.findOne({
       where,
-      select: ['id', 'identity', 'username'],
-      relations: forcePassword ? ['password'] : [],
+      relations: {
+        password: true,
+        grade: {
+          subjects: false,
+          classInfos: false,
+        },
+        classInfo: {
+          grade: false,
+          testPapers: false,
+        },
+      },
     });
     if (!user) {
       return null;
     }
-    return user;
+    return new UserVO(user);
   }
 
-  update(updateUserDto: UpdateUserDto) {
-    return `This action updates a #${updateUserDto.id} user`;
+  async update(updateUserDto: UpdateUserDto) {
+    await this.usersRepository.update(
+      {
+        id: updateUserDto.id,
+      },
+      {
+        ...updateUserDto,
+        grade: updateUserDto.grade
+          ? {
+              id: updateUserDto.grade,
+            }
+          : undefined,
+        classInfo: updateUserDto.classInfo
+          ? {
+              id: updateUserDto.classInfo,
+            }
+          : undefined,
+      },
+    );
+    return true;
   }
 
   remove(id: number) {

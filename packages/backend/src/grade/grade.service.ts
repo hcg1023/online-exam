@@ -12,7 +12,7 @@ export class GradeService {
     return `This action returns all grade`;
   }
 
-  findOne(id: number) {
+  findOne(id: string) {
     return `This action returns a #${id} grade`;
   }
 

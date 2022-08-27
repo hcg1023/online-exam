@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { UserOutlined, LockOutlined } from '@ant-design/icons-vue'
-import { IdentityEnum } from '@online-exam/contants'
+import { IdentityEnum } from '~/constants/enums'
 
 const userInfo = reactive({
   name: '',

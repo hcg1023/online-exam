@@ -5,9 +5,9 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { IdentityEnum } from '@online-exam/contants';
+import { IdentityEnum } from '../enums';
 import { ROLES_KEY } from './role.decorator';
-import { ViewUserDto } from '../user/dto/view-user.dto';
+import { User } from '../user/entities/user.entity';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
@@ -21,7 +21,7 @@ export class RolesGuard implements CanActivate {
     if (!requiredRoles) {
       return true;
     }
-    const { user } = context.switchToHttp().getRequest<{ user: ViewUserDto }>();
+    const { user } = context.switchToHttp().getRequest<{ user: User }>();
     const result = requiredRoles.some((role) => user.identity === role);
     if (!result) {
       throw new UnauthorizedException();

@@ -11,9 +11,9 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Roles } from '../role/role.decorator';
-import { IdentityEnum } from '@online-exam/contants';
-import { User } from '../auth/user.decorator';
-import { ViewUserDto } from './dto/view-user.dto';
+import { IdentityEnum } from '../enums';
+import { RequestUser } from '../auth/user.decorator';
+import { User } from './entities/user.entity';
 
 @ApiBearerAuth()
 @ApiTags('User')
@@ -25,19 +25,24 @@ export class UserController {
   @Post('create')
   @ApiResponse({
     status: 200,
-    type: ViewUserDto,
+    type: User,
   })
-  create(@Body() createUserDto: CreateUserDto, @User() user: ViewUserDto) {
+  create(@Body() createUserDto: CreateUserDto, @RequestUser() user: User) {
     if (
       user.identity === IdentityEnum.TEACHER &&
       createUserDto.identity !== IdentityEnum.STUDENT
     ) {
       throw new UnauthorizedException();
     }
+    createUserDto.createdUser = user.id;
     return this.userService.create(createUserDto);
   }
 
   @Get('list')
+  @ApiResponse({
+    status: 200,
+    type: [User],
+  })
   findAll() {
     return this.userService.findAll();
   }
@@ -47,12 +52,12 @@ export class UserController {
     return this.userService.findOne(id);
   }
 
-  @Post()
+  @Post('update')
   update(@Body() updateUserDto: UpdateUserDto) {
     return this.userService.update(updateUserDto);
   }
 
-  @Post(':id')
+  @Post('remove/:id')
   remove(@Param('id') id: number) {
     return this.userService.remove(id);
   }

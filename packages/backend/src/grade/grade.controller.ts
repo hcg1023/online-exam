@@ -1,8 +1,21 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { GradeService } from './grade.service';
 import { CreateGradeDto } from './dto/create-grade.dto';
 import { UpdateGradeDto } from './dto/update-grade.dto';
+import { ApiBearerAuth } from '@nestjs/swagger';
+import { Roles } from '../role/role.decorator';
+import { IdentityEnum } from '../enums';
 
+@ApiBearerAuth()
+@Roles(IdentityEnum.ADMIN)
 @Controller('grade')
 export class GradeController {
   constructor(private readonly gradeService: GradeService) {}
@@ -19,7 +32,7 @@ export class GradeController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.gradeService.findOne(+id);
+    return this.gradeService.findOne(id);
   }
 
   @Patch(':id')

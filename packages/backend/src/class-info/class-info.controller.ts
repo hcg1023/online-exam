@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { ClassInfoService } from './class-info.service';
 import { CreateClassInfoDto } from './dto/create-class-info.dto';
 import { UpdateClassInfoDto } from './dto/update-class-info.dto';
@@ -19,11 +27,14 @@ export class ClassInfoController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.classInfoService.findOne(+id);
+    return this.classInfoService.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateClassInfoDto: UpdateClassInfoDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateClassInfoDto: UpdateClassInfoDto,
+  ) {
     return this.classInfoService.update(+id, updateClassInfoDto);
   }
 

@@ -12,15 +12,15 @@ export class SubjectService {
     return `This action returns all subject`;
   }
 
-  findOne(id: number) {
+  findOne(id: string) {
     return `This action returns a #${id} subject`;
   }
 
-  update(id: number, updateSubjectDto: UpdateSubjectDto) {
-    return `This action updates a #${id} subject`;
+  update(updateSubjectDto: UpdateSubjectDto) {
+    return `This action updates a #${updateSubjectDto.id} subject`;
   }
 
-  remove(id: number) {
+  remove(id: string) {
     return `This action removes a #${id} subject`;
   }
 }

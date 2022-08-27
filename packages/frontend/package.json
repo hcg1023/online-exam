@@ -10,7 +10,6 @@
   },
   "dependencies": {
     "@ant-design/icons-vue": "^6.1.0",
-    "@online-exam/contants": "^0.0.1",
     "@unocss/reset": "^0.44.5",
     "@vueuse/core": "^8.9.2",
     "ant-design-vue": "^3.2.10",

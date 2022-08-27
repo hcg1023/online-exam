@@ -24,6 +24,7 @@ import { AnswerModule } from './answer/answer.module';
       database: 'online_exam',
       autoLoadEntities: true,
       synchronize: true,
+      timezone: '+08:00',
     }),
     UserModule,
     AuthModule,
