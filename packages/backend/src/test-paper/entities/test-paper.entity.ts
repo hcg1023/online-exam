@@ -21,10 +21,6 @@ export class TestPaper {
   @Column()
   title: string;
 
-  // 允许多个试卷对应多个班级
-  @ManyToMany(() => ClassInfo, (classInfo) => classInfo.testPapers)
-  classInfos: ClassInfo[];
-
   // 允许多个试卷对应一个学科
   @ManyToOne(() => Subject)
   subject: Subject;

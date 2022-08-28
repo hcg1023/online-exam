@@ -1,4 +1,5 @@
 import {
+  Column,
   Entity,
   JoinTable,
   ManyToMany,
@@ -12,6 +13,12 @@ import { TestPaper } from './test-paper.entity';
 export class QuestionGroup {
   @PrimaryGeneratedColumn('uuid')
   id: string;
+
+  @Column()
+  order: number;
+
+  @Column()
+  title: string;
 
   // 允许多个题组对应一个试卷
   @ManyToOne(() => TestPaper, (testPaper) => testPaper.questionGroups)

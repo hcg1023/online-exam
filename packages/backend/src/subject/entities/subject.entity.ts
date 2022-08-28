@@ -13,7 +13,9 @@ export class Subject {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column()
+  @Column({
+    unique: true,
+  })
   name: string;
 
   @ManyToMany(() => Grade, (grade) => grade.subjects)
