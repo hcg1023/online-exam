@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { useColumns } from "./columns";
 import type { responseData } from "/#/index";
-import { getDisciplineList, deleteDiscipline } from "/@/api/system";
+import { getAdministratorList } from "./services";
+import { deleteUser } from "/@/api/user";
 import { FormInstance } from "element-plus";
 import { handleTree } from "@pureadmin/utils";
 import { reactive, ref, onMounted } from "vue";
@@ -14,7 +15,7 @@ defineOptions({
 });
 
 const form = reactive({
-  name: "",
+  username: "",
   pageNo: 1,
   pageSize: 10
 });
@@ -43,7 +44,7 @@ function handle(type: string, row: any) {
 }
 
 const handleDelete = async (row: any) => {
-  const { code, message: msg }: responseData = await deleteDiscipline(row.id);
+  const { code, message: msg }: responseData = await deleteUser(row.id);
   if (code === 200) {
     onSearch();
     message.success("删除成功");
@@ -59,7 +60,7 @@ async function onSearch() {
   loading.value = true;
   let {
     data: { results }
-  } = await getDisciplineList(form);
+  } = await getAdministratorList(form);
   dataList.value = handleTree(results as any);
   loading.value = false;
 }
@@ -83,8 +84,8 @@ onMounted(() => {
       :model="form"
       class="bg-white dark:bg-dark w-99/100 pl-8 pt-4"
     >
-      <el-form-item label="学科名称：" prop="name">
-        <el-input v-model="form.name" placeholder="请输入学科名称" clearable />
+      <el-form-item label="管理员名称：" prop="username">
+        <el-input v-model="form.username" placeholder="请输入管理员名称" clearable />
       </el-form-item>
       <!-- <el-form-item label="状态：" prop="status">
         <el-select v-model="form.status" placeholder="请选择状态" clearable>
@@ -108,7 +109,7 @@ onMounted(() => {
     </el-form>
 
     <TableProBar
-      title="学科列表"
+      title="管理员列表"
       :loading="loading"
       :tableRef="tableRef?.getTableRef()"
       :dataList="dataList"
@@ -120,7 +121,7 @@ onMounted(() => {
           @click="handle('add')"
           :icon="useRenderIcon('add')"
         >
-          新增学科
+          新增管理员
         </el-button>
       </template>
       <template v-slot="{ size, checkList }">

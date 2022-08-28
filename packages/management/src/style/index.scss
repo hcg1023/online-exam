@@ -56,3 +56,6 @@ html {
 .vxe-pager .vxe-pager--num-btn:not(.is--disabled).is--active {
   color: #fff !important;
 }
+.ant-message{
+  z-index: 9999 !important;
+}

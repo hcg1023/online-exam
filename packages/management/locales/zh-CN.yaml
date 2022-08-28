@@ -22,9 +22,15 @@ menus:
   hshome: 首页
   hslogin: 登录
   hsempty: 无Layout页
-  hssysManagement: 系统管理
+  hssysManagement: 学院管理
+  hsTeachers: 教师管理
+  hsStudents: 学生管理
+  hsAdministrator: 管理员
   hsUser: 用户管理
   hsGrade: 年级管理
+  hsQuestion: 试题管理
+  hsTestPaper: 试卷管理
+  hsTask: 考试管理
   hsSubject: 学科管理
   hsDict: 字典管理
   hsRole: 角色管理

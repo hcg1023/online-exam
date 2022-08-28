@@ -4,7 +4,7 @@
  * @Version: 1.0
  * @LastEditors: @yzcheng
  * @Description: 
- * @LastEditTime: 2022-08-28 15:42:21
+ * @LastEditTime: 2022-08-28 20:05:16
  */
 import { ref } from "vue";
 import dayjs from "dayjs";
@@ -25,16 +25,31 @@ export function useColumns() {
       hide: ({ checkList }) => !checkList.includes("序号列")
     },
     {
-      label: "年级名称",
+      label: "试题名称",
       prop: "title",
       align: "left"
     },
-    // {
-    //   label: "班级名称",
-    //   prop: "name",
-    //   width: 180,
-    //   align: "left"
-    // },
+    {
+      label: "试题类型",
+      prop: "typeName",
+      align: "left"
+    },
+    {
+      label: "年级",
+      prop: "grade.title",
+      align: "left"
+    },
+    {
+      label: "学科",
+      prop: "subject.name",
+      align: "left"
+    },
+    {
+      label: "难度",
+      prop: "difficulty",
+      align: "left",
+      slot: "difficulty"
+    },
     // {
     //   label: "排序",
     //   prop: "sort",
@@ -56,9 +71,10 @@ export function useColumns() {
     // },
     {
       label: "创建时间",
-      prop: "createTime",
-      formatter: ({ createTime }) =>
-        dayjs(createTime).format("YYYY-MM-DD HH:mm:ss")
+      width: 180,
+      prop: "createdDate",
+      formatter: ({ createdDate }) =>
+        dayjs(createdDate).format("YYYY-MM-DD HH:mm:ss")
     },
     // {
     //   label: "备注",

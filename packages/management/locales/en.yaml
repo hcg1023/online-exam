@@ -22,9 +22,15 @@ menus:
   hshome: Home
   hslogin: Login
   hsempty: Empty Page
-  hssysManagement: System Manage
+  hssysManagement: College Manage
+  hsTeachers: Teachers Manage
+  hsStudents: Students Manage
+  hsAdministrator: Administrator Manage
   hsUser: User Manage
   hsGrade: Grade Manage
+  hsQuestion: Question Manage
+  hsTestPaper: TestPaper Manage
+  hsTask: Task Manage
   hsSubject: Subject Manage
   hsDict: Dict Manage
   hsRole: Role Manage

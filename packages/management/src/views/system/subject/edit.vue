@@ -4,7 +4,7 @@
  * @Version: 1.0
  * @LastEditors: @yzcheng
  * @Description: 学科 新增编辑
- * @LastEditTime: 2022-08-27 20:00:40
+ * @LastEditTime: 2022-08-28 18:24:03
 -->
 <template>
   <el-dialog
@@ -15,23 +15,14 @@
   >
     <div class="dept-editor">
       <div class="wrap-box">
-        <el-form ref="ruleFormRef" :model="formState" :rules="rules">
+        <el-form ref="ruleFormRef" label-width="100px" :model="formState" :rules="rules">
           <el-row>
             <el-col :span="24">
-              <el-form-item label="班级名称" prop="name">
+              <el-form-item label="学科名称" prop="name">
                 <el-input
                   :disabled="isDisabled"
                   v-model="formState.name"
-                  placeholder="请输入班级名称"
-                />
-              </el-form-item>
-            </el-col>
-            <el-col :span="24">
-              <el-form-item label="年级名称" prop="grade">
-                <el-input
-                  :disabled="isDisabled"
-                  v-model="formState.grade"
-                  placeholder="请输入年级名称"
+                  placeholder="请输入学科名称"
                 />
               </el-form-item>
             </el-col>
@@ -39,17 +30,25 @@
         </el-form>
       </div>
       <div class="con-bottom">
-        <el-button type="primary" @click.prevent="onSubmit(ruleFormRef)"
+        <el-button
+          :loading="loading"
+          type="primary"
+          @click.prevent="onSubmit(ruleFormRef)"
           >提交</el-button
         >
         <el-button
           type="primary"
           ghost
+          :loading="loading"
           style="margin-left: 10px"
           @click="resetForm(ruleFormRef)"
           >重置</el-button
         >
-        <el-button ghost style="margin-left: 10px" @click="handleAddUpdCancel"
+        <el-button
+          :loading="loading"
+          ghost
+          style="margin-left: 10px"
+          @click="handleAddUpdCancel"
           >返回</el-button
         >
       </div>
@@ -68,7 +67,11 @@ import {
   getCurrentInstance
 } from "vue";
 import type { responseData } from "/#/index";
-import { updateDisciplineList, findDisciplineDetailed, addDisciplineList } from "./services";
+import {
+  updateDisciplineList,
+  findDisciplineDetailed,
+  addDisciplineList
+} from "./services";
 import { message } from "@pureadmin/components";
 import type { FormInstance, FormRules } from "element-plus";
 const ruleFormRef = ref<FormInstance>();
@@ -92,8 +95,8 @@ const props = defineProps({
   }
 });
 const dictionary = {
-  add: "班级添加",
-  update: "班级更新"
+  add: "学科添加",
+  edit: "学科更新"
 };
 const dialogVisible = computed({
   get: () => props.visible,
@@ -104,9 +107,9 @@ const handleAddUpdCancel = () => {
 };
 const taskJobVisible = ref(1);
 // 表单数据
-const formState = reactive({
-  name: "",
-  grade: ""
+const formState: any = reactive({
+  id: null,
+  name: ""
 });
 // 校验
 const rules = reactive<FormRules>({
@@ -114,18 +117,11 @@ const rules = reactive<FormRules>({
     {
       required: true,
       trigger: "change",
-      message: "班级是必传项"
-    }
-  ],
-  grade: [
-    {
-      required: true,
-      trigger: "change",
-      message: "年级是必传项"
+      message: "学科是必传项"
     }
   ]
 });
-
+const loading = ref(false);
 // 表单
 // 重置
 const resetForm = async (formEl: FormInstance | undefined) => {
@@ -135,28 +131,31 @@ const resetForm = async (formEl: FormInstance | undefined) => {
 // 新增
 const insertRegulatory = async (data: any) => {
   const res: responseData = await addDisciplineList(data);
-  if (res.code === 0) {
+  if (res.code === 200) {
     await props.onUpdate();
     handleAddUpdCancel();
     message.success("新增成功");
   } else {
     message.error(res.message);
   }
+  loading.value = false;
 };
 // 修改
 const updateRegulatory = async (data: any) => {
   const res: responseData = await updateDisciplineList(data);
-  if (res.code === 0) {
+  if (res.code === 200) {
     await props.onUpdate();
     handleAddUpdCancel();
     message.success("更新成功");
   } else {
     message.error(res.message);
   }
+  loading.value = false;
 };
 // 提交
 const onSubmit = async (formEl: FormInstance | undefined) => {
   if (!formEl) return;
+  loading.value = true;
   await formEl.validate((valid, fields) => {
     if (valid) {
       const data = toRaw(formState);
@@ -165,6 +164,8 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
       } else {
         insertRegulatory(data);
       }
+    }else{
+      loading.value = false;
     }
   });
 };
@@ -172,14 +173,13 @@ const isShowBtn = ref(true);
 const isDisabled = ref(false);
 
 onMounted(async () => {
-    const { type, id } = props;
+  const { type, id } = props;
   if (["edit"].includes(type)) {
     const res = await findDisciplineDetailed(id);
-    if (res.code === 0) {
-    // formState.id = id;
-    // Object.entries(res.data).forEach(([key]) => {
-    //   formState[key] = res.data[key];
-    // });
+    if (res.code === 200) {
+      Object.entries(res.data).forEach(([key]) => {
+        formState[key] = res.data[key];
+      });
     }
   }
 });

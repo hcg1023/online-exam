@@ -10,14 +10,6 @@ const systemRouter = {
     rank: 11
   },
   children: [
-    {
-      path: "/system/user/index",
-      name: "User",
-      meta: {
-        icon: "flUser",
-        title: "menus.hsUser"
-      }
-    },
     // {
     //   path: "/system/role/index",
     //   name: "Role",
@@ -26,6 +18,30 @@ const systemRouter = {
     //     title: "menus.hsRole"
     //   }
     // },
+    {
+      path: "/system/testPaper/index",
+      name: "TestPaper",
+      meta: {
+        icon: "expand",
+        title: "menus.hsTestPaper"
+      }
+    },
+    {
+      path: "/system/question/index",
+      name: "Question",
+      meta: {
+        icon: "unExpand",
+        title: "menus.hsQuestion"
+      }
+    },
+    {
+      path: "/system/task/index",
+      name: "Task",
+      meta: {
+        icon: "location-company",
+        title: "menus.hsTask"
+      }
+    },
     {
       path: "/system/subject/index",
       name: "Subject",
@@ -58,6 +74,40 @@ const systemRouter = {
         icon: "dict",
         title: "menus.hsDict",
         keepAlive: true
+      }
+    }
+  ]
+};
+const userRouter = {
+  path: "/user",
+  meta: {
+    icon: "setting",
+    title: "menus.hsUser",
+    rank: 12
+  },
+  children: [
+    {
+      path: "/user/teachers/index",
+      name: "Teachers",
+      meta: {
+        icon: "flUser",
+        title: "menus.hsTeachers"
+      }
+    },
+    {
+      path: "/user/students/index",
+      name: "Students",
+      meta: {
+        icon: "role",
+        title: "menus.hsStudents"
+      }
+    },
+    {
+      path: "/user/administrator/index",
+      name: "Administrator",
+      meta: {
+        icon: "setting",
+        title: "menus.hsAdministrator"
       }
     }
   ]
@@ -172,6 +222,7 @@ export default [
         return {
           code: 0,
           info: [
+            userRouter,
             // tabsRouter,
             // frameRouter,
             systemRouter,

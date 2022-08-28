@@ -3,8 +3,8 @@
  * @Date: 2022-05-18 13:37:33
  * @Version: 1.0
  * @LastEditors: @yzcheng
- * @Description: 年级 新增编辑
- * @LastEditTime: 2022-08-28 18:04:58
+ * @Description: 学科 新增编辑
+ * @LastEditTime: 2022-08-28 18:03:41
 -->
 <template>
   <el-dialog
@@ -16,33 +16,74 @@
     <div class="dept-editor">
       <div class="wrap-box">
         <el-form
-          label-width="100px"
           ref="ruleFormRef"
+          label-width="100px"
           :model="formState"
           :rules="rules"
         >
           <el-row>
             <el-col :span="24">
-              <el-form-item label="年级名称" prop="title">
+              <el-form-item label="用户名" prop="username">
                 <el-input
-                  v-model="formState.title"
-                  placeholder="请输入班级名称"
+                  v-model="formState.username"
+                  placeholder="请输入用户名称"
+                />
+              </el-form-item>
+            </el-col>
+            <el-col v-if="type !== 'edit'" :span="24">
+              <el-form-item label="密码" prop="password">
+                <el-input
+                  v-model="formState.password"
+                  placeholder="请输入密码"
+                  show-password
                 />
               </el-form-item>
             </el-col>
             <el-col :span="24">
-              <el-form-item label="学科" prop="subjects">
+              <el-form-item label="真实姓名" prop="name">
+                <el-input
+                  v-model="formState.name"
+                  placeholder="请输入真实姓名"
+                />
+              </el-form-item>
+            </el-col>
+            <el-col :span="24">
+              <el-form-item label="年龄" prop="age">
+                <el-input-number
+                  :min="1"
+                  :max="100"
+                  :controls="false"
+                  v-model="formState.age"
+                  placeholder="请输入年龄"
+                />
+              </el-form-item>
+            </el-col>
+            <el-col :span="24">
+              <el-form-item label="性别" prop="sex">
                 <el-select
-                  multiple
-                  v-model="formState.subjects"
-                  placeholder="请选择学科"
+                  v-model="formState.sex"
+                  placeholder="请选择性别"
+                  clearable
                 >
-                  <el-option
-                    v-for="{ id, name } in subjectList"
-                    :key="id"
-                    :label="name"
-                    :value="id"
-                  />
+                  <el-option label="男" value="BOY" />
+                  <el-option label="女" value="GIRL" />
+                </el-select>
+              </el-form-item>
+            </el-col>
+            <el-col :span="24">
+              <el-form-item label="邮箱" prop="email">
+                <el-input v-model="formState.email" placeholder="请输入邮箱" />
+              </el-form-item>
+            </el-col>
+            <el-col :span="24">
+              <el-form-item label="状态" prop="status">
+                <el-select
+                  v-model="formState.status"
+                  placeholder="请选择状态"
+                  clearable
+                >
+                  <el-option label="启用" value="ENABLE" />
+                  <el-option label="禁用" value="DISABLED" />
                 </el-select>
               </el-form-item>
             </el-col>
@@ -87,9 +128,8 @@ import {
   getCurrentInstance
 } from "vue";
 import type { responseData } from "/#/index";
-import { updateGradeList, findGradeDetailed, addGradeList } from "./services";
+import { updateUser, findUserDetailed, addUserList } from "/@/api/user";
 import { message } from "@pureadmin/components";
-import { getDisciplineList } from "/@/api/system";
 import type { FormInstance, FormRules } from "element-plus";
 const ruleFormRef = ref<FormInstance>();
 const { ctx }: any = getCurrentInstance();
@@ -112,8 +152,8 @@ const props = defineProps({
   }
 });
 const dictionary = {
-  add: "年级添加",
-  edit: "年级更新"
+  add: "管理员添加",
+  edit: "管理员更新"
 };
 const dialogVisible = computed({
   get: () => props.visible,
@@ -122,25 +162,78 @@ const dialogVisible = computed({
 const handleAddUpdCancel = () => {
   ctx.$emit("update:visible", false);
 };
+const validateEmail = (rule: any, value: any, callback: any) => {
+  let reg = /^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/;
+  if (!reg.test(value)) {
+    callback(new Error("邮箱格式不正确"));
+  } else {
+    callback();
+  }
+};
 const taskJobVisible = ref(1);
 // 表单数据
 const formState: any = reactive({
-  id: null,
-  title: "",
-  subjects: []
+  identity: 0,
+  username: "",
+  password: "",
+  name: "",
+  age: 1,
+  sex: "BOY",
+  status: "ENABLE",
+  email: ""
 });
 // 校验
 const rules = reactive<FormRules>({
-  title: [
+  sex: [
     {
       required: true,
       trigger: "change",
-      message: "年级是必传项"
+      message: "性别是必传项"
     }
   ],
-  subjects: [
+  status: [
     {
-      required: false
+      required: true,
+      trigger: "change",
+      message: "状态是必传项"
+    }
+  ],
+  email: [
+    {
+      required: true,
+      trigger: "change",
+      message: "邮箱是必传项"
+    },
+    { validator: validateEmail, trigger: "blur" }
+  ],
+  age: [
+    {
+      required: true,
+      trigger: "change",
+      message: "年龄是必传项"
+    }
+  ],
+  username: [
+    {
+      required: true,
+      trigger: "change",
+      message: "用户名是必传项"
+    },
+    { min: 3, message: "用户名必须大于三个字符", trigger: "change" }
+  ],
+  password: [
+    {
+      required: true,
+      trigger: "change",
+      message: "密码是必传项"
+    },
+    { min: 5, message: "密码必须大于五个字符", trigger: "change" }
+  ],
+  name: [
+    {
+      required: true,
+      trigger: "change",
+      message: "真实姓名是必传项"
     }
   ]
 });
@@ -153,7 +246,7 @@ const resetForm = async (formEl: FormInstance | undefined) => {
 };
 // 新增
 const insertRegulatory = async (data: any) => {
-  const res: responseData = await addGradeList(data);
+  const res: responseData = await addUserList(data);
   if (res.code === 200) {
     await props.onUpdate();
     handleAddUpdCancel();
@@ -165,7 +258,7 @@ const insertRegulatory = async (data: any) => {
 };
 // 修改
 const updateRegulatory = async (data: any) => {
-  const res: responseData = await updateGradeList(data);
+  const res: responseData = await updateUser(data);
   if (res.code === 200) {
     await props.onUpdate();
     handleAddUpdCancel();
@@ -194,17 +287,15 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
 };
 const isShowBtn = ref(true);
 const isDisabled = ref(false);
-const subjectList = ref([]);
+
 onMounted(async () => {
-  const rs = await getDisciplineList({ pageNo: 1, pageSize: 1000 });
-  subjectList.value = rs?.data?.results;
   const { type, id } = props;
   if (["edit"].includes(type)) {
-    const res = await findGradeDetailed(id);
+    const res = await findUserDetailed(id);
     if (res.code === 200) {
-      formState["id"] = res.data["id"];
-      formState["title"] = res.data["title"];
-      formState["subjects"] = res.data["subjects"]?.map((i: any) => i.id);
+      Object.entries(res.data).forEach(([key]) => {
+        formState[key] = res.data[key];
+      });
     }
   }
 });

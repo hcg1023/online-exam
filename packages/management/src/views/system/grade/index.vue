@@ -14,7 +14,9 @@ defineOptions({
 });
 
 const form = reactive({
-  name: ""
+  title: "",
+  pageNo: 1,
+  pageSize: 10
 });
 let dataList = ref([]);
 let loading = ref(true);
@@ -40,25 +42,27 @@ function handle(type: string, row: any) {
   }
 }
 
-function handleDelete(row: any) {
-  deleteDept(row.id).then(({ code }: responseData) => {
-    if (code === 200) {
-      onSearch();
-      message.success("删除成功");
-    }
-  });
-}
+const handleDelete = async (row: any) => {
+  const { code, message: msg }: responseData = await deleteGrade(row.id);
+  if (code === 200) {
+    onSearch();
+    message.success("删除成功");
+  } else {
+    message.error(msg);
+  }
+};
 
 function handleSelectionChange(val) {
   console.log("handleSelectionChange", val);
 }
 
 async function onSearch() {
-  let { data } = await getGradeList(form);
-  dataList.value = handleTree(data as any);
-  setTimeout(() => {
-    loading.value = false;
-  }, 500);
+  loading.value = true;
+  let {
+    data: { results }
+  } = await getGradeList(form);
+  dataList.value = handleTree(results as any);
+  loading.value = false;
 }
 
 const resetForm = (formEl: FormInstance | undefined) => {
@@ -80,8 +84,8 @@ onMounted(() => {
       :model="form"
       class="bg-white dark:bg-dark w-99/100 pl-8 pt-4"
     >
-      <el-form-item label="年级名称：" prop="user">
-        <el-input v-model="form.name" placeholder="请输入年级名称" clearable />
+      <el-form-item label="年级名称：" prop="title">
+        <el-input v-model="form.title" placeholder="请输入年级名称" clearable />
       </el-form-item>
       <!-- <el-form-item label="状态：" prop="status">
         <el-select v-model="form.status" placeholder="请选择状态" clearable>
@@ -98,7 +102,11 @@ onMounted(() => {
         >
           搜索
         </el-button>
-        <el-button :icon="useRenderIcon('refresh')" @click="resetForm(formRef)">
+        <el-button
+          :loading="loading"
+          :icon="useRenderIcon('refresh')"
+          @click="resetForm(formRef)"
+        >
           重置
         </el-button>
       </el-form-item>
@@ -117,7 +125,7 @@ onMounted(() => {
           @click="handle('add')"
           :icon="useRenderIcon('add')"
         >
-          新增班级
+          新增年级
         </el-button>
       </template>
       <template v-slot="{ size, checkList }">
@@ -140,6 +148,7 @@ onMounted(() => {
         >
           <template #operation="{ row }">
             <el-button
+              :loading="loading"
               class="reset-margin"
               link
               type="primary"
@@ -152,6 +161,7 @@ onMounted(() => {
             <el-popconfirm @confirm="handleDelete(row)" title="是否确认删除?">
               <template #reference>
                 <el-button
+                  :loading="loading"
                   class="reset-margin"
                   link
                   type="primary"

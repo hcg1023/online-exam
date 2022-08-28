@@ -4,7 +4,7 @@
  * @Version: 1.0
  * @LastEditors: @yzcheng
  * @Description: 
- * @LastEditTime: 2022-08-27 17:30:50
+ * @LastEditTime: 2022-08-28 15:12:05
  */
 import { ref } from "vue";
 import dayjs from "dayjs";
@@ -25,15 +25,8 @@ export function useColumns() {
       hide: ({ checkList }) => !checkList.includes("序号列")
     },
     {
-      label: "年级名称",
-      prop: "grade.title",
-      width: 180,
-      align: "left"
-    },
-    {
-      label: "班级名称",
+      label: "学科",
       prop: "name",
-      width: 180,
       align: "left"
     },
     // {
@@ -57,15 +50,14 @@ export function useColumns() {
     // },
     {
       label: "创建时间",
-      width: 180,
       prop: "createTime",
       formatter: ({ createTime }) =>
         dayjs(createTime).format("YYYY-MM-DD HH:mm:ss")
     },
-    {
-      label: "备注",
-      prop: "remark"
-    },
+    // {
+    //   label: "备注",
+    //   prop: "remark"
+    // },
     {
       label: "操作",
       fixed: "right",

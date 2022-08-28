@@ -1,3 +1,11 @@
+/*
+ * @Author: @yzcheng
+ * @Date: 2022-08-27 13:46:33
+ * @Version: 1.0
+ * @LastEditors: @yzcheng
+ * @Description: 
+ * @LastEditTime: 2022-08-28 18:56:05
+ */
 import App from "./App.vue";
 import router from "./router";
 import { setupStore } from "/@/store";

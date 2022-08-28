@@ -3,8 +3,8 @@
  * @Date: 2022-05-18 13:37:33
  * @Version: 1.0
  * @LastEditors: @yzcheng
- * @Description: 年级 新增编辑
- * @LastEditTime: 2022-08-28 18:04:58
+ * @Description: 班级 新增编辑
+ * @LastEditTime: 2022-08-28 19:52:01
 -->
 <template>
   <el-dialog
@@ -15,32 +15,24 @@
   >
     <div class="dept-editor">
       <div class="wrap-box">
-        <el-form
-          label-width="100px"
-          ref="ruleFormRef"
-          :model="formState"
-          :rules="rules"
-        >
+        <el-form ref="ruleFormRef" label-width="100px" :model="formState" :rules="rules">
           <el-row>
             <el-col :span="24">
-              <el-form-item label="年级名称" prop="title">
+              <el-form-item label="班级名称" prop="name">
                 <el-input
-                  v-model="formState.title"
+                  :disabled="isDisabled"
+                  v-model="formState.name"
                   placeholder="请输入班级名称"
                 />
               </el-form-item>
             </el-col>
             <el-col :span="24">
-              <el-form-item label="学科" prop="subjects">
-                <el-select
-                  multiple
-                  v-model="formState.subjects"
-                  placeholder="请选择学科"
-                >
+              <el-form-item label="年级名称" prop="grade">
+                <el-select v-model="formState.grade" placeholder="请选择学科">
                   <el-option
-                    v-for="{ id, name } in subjectList"
+                    v-for="{ id, title } in gradeList"
                     :key="id"
-                    :label="name"
+                    :label="title"
                     :value="id"
                   />
                 </el-select>
@@ -51,8 +43,8 @@
       </div>
       <div class="con-bottom">
         <el-button
-          :loading="loading"
           type="primary"
+          :loading="loading"
           @click.prevent="onSubmit(ruleFormRef)"
           >提交</el-button
         >
@@ -65,8 +57,8 @@
           >重置</el-button
         >
         <el-button
-          :loading="loading"
           ghost
+          :loading="loading"
           style="margin-left: 10px"
           @click="handleAddUpdCancel"
           >返回</el-button
@@ -87,9 +79,9 @@ import {
   getCurrentInstance
 } from "vue";
 import type { responseData } from "/#/index";
-import { updateGradeList, findGradeDetailed, addGradeList } from "./services";
+import { updateQuestionList, findQuestionDetailed, addQuestionList } from "./services";
 import { message } from "@pureadmin/components";
-import { getDisciplineList } from "/@/api/system";
+import { getGradeList } from "/@/api/system";
 import type { FormInstance, FormRules } from "element-plus";
 const ruleFormRef = ref<FormInstance>();
 const { ctx }: any = getCurrentInstance();
@@ -112,8 +104,8 @@ const props = defineProps({
   }
 });
 const dictionary = {
-  add: "年级添加",
-  edit: "年级更新"
+  add: "班级添加",
+  edit: "班级更新"
 };
 const dialogVisible = computed({
   get: () => props.visible,
@@ -125,22 +117,24 @@ const handleAddUpdCancel = () => {
 const taskJobVisible = ref(1);
 // 表单数据
 const formState: any = reactive({
-  id: null,
-  title: "",
-  subjects: []
+  name: "",
+  grade: ""
 });
 // 校验
 const rules = reactive<FormRules>({
-  title: [
+  name: [
+    {
+      required: true,
+      trigger: "change",
+      message: "班级是必传项"
+    },
+    { min: 2, message: "班级名称必须大于等于两个汉字", trigger: "change" }
+  ],
+  grade: [
     {
       required: true,
       trigger: "change",
       message: "年级是必传项"
-    }
-  ],
-  subjects: [
-    {
-      required: false
     }
   ]
 });
@@ -153,7 +147,7 @@ const resetForm = async (formEl: FormInstance | undefined) => {
 };
 // 新增
 const insertRegulatory = async (data: any) => {
-  const res: responseData = await addGradeList(data);
+  const res: responseData = await addQuestionList(data);
   if (res.code === 200) {
     await props.onUpdate();
     handleAddUpdCancel();
@@ -165,7 +159,7 @@ const insertRegulatory = async (data: any) => {
 };
 // 修改
 const updateRegulatory = async (data: any) => {
-  const res: responseData = await updateGradeList(data);
+  const res: responseData = await updateQuestionList(data);
   if (res.code === 200) {
     await props.onUpdate();
     handleAddUpdCancel();
@@ -194,17 +188,17 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
 };
 const isShowBtn = ref(true);
 const isDisabled = ref(false);
-const subjectList = ref([]);
+const gradeList = ref([]);
 onMounted(async () => {
-  const rs = await getDisciplineList({ pageNo: 1, pageSize: 1000 });
-  subjectList.value = rs?.data?.results;
+  const rs = await getGradeList({ pageNo: 1, pageSize: 1000 });
+  gradeList.value = rs?.data?.results;
   const { type, id } = props;
   if (["edit"].includes(type)) {
-    const res = await findGradeDetailed(id);
+    const res = await findQuestionDetailed(id);
     if (res.code === 200) {
       formState["id"] = res.data["id"];
-      formState["title"] = res.data["title"];
-      formState["subjects"] = res.data["subjects"]?.map((i: any) => i.id);
+      formState["name"] = res.data["name"];
+      formState["grade"] = res.data["grade"]?.id;
     }
   }
 });

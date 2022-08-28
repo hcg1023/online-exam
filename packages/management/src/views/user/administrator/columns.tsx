@@ -3,8 +3,8 @@
  * @Date: 2022-08-27 13:46:33
  * @Version: 1.0
  * @LastEditors: @yzcheng
- * @Description: 
- * @LastEditTime: 2022-08-28 15:42:21
+ * @Description:
+ * @LastEditTime: 2022-08-28 18:09:15
  */
 import { ref } from "vue";
 import dayjs from "dayjs";
@@ -25,16 +25,41 @@ export function useColumns() {
       hide: ({ checkList }) => !checkList.includes("序号列")
     },
     {
-      label: "年级名称",
-      prop: "title",
+      label: "用户名",
+      prop: "username",
       align: "left"
     },
-    // {
-    //   label: "班级名称",
-    //   prop: "name",
-    //   width: 180,
-    //   align: "left"
-    // },
+    {
+      label: "真实名称",
+      prop: "name",
+      align: "left"
+    },
+    {
+      label: "年龄",
+      prop: "age",
+      align: "left",
+      formatter: ({ age }) => `${age}岁`
+    },
+    {
+      label: "性别",
+      prop: "sexName",
+      align: "left"
+    },
+    {
+      label: "职责",
+      prop: "identityName",
+      align: "left"
+    },
+    {
+      label: "邮箱",
+      prop: "email",
+      align: "left"
+    },
+    {
+      label: "状态",
+      prop: "useStatusName",
+      align: "left"
+    },
     // {
     //   label: "排序",
     //   prop: "sort",
@@ -56,9 +81,9 @@ export function useColumns() {
     // },
     {
       label: "创建时间",
-      prop: "createTime",
-      formatter: ({ createTime }) =>
-        dayjs(createTime).format("YYYY-MM-DD HH:mm:ss")
+      prop: "createdDate",
+      formatter: ({ createdDate }) =>
+        dayjs(createdDate).format("YYYY-MM-DD HH:mm:ss")
     },
     // {
     //   label: "备注",
