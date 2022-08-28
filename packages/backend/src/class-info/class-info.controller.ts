@@ -12,6 +12,7 @@ import {
 } from '../decorators/response.decorator';
 import { ClassInfoVO } from './entities/class-info.vo.entity';
 import { ListClassInfoDto } from './dto/list-class-info.dto';
+import { PaginatedVO } from '../common/paginated.vo.entity';
 
 @ApiBearerAuth()
 @Roles(IdentityEnum.ADMIN)
@@ -28,8 +29,14 @@ export class ClassInfoController {
 
   @Get('list')
   @ApiPaginatedResponse(ClassInfoVO)
-  findAll(@Query() query: ListClassInfoDto) {
-    return this.classInfoService.findAll(query);
+  async findAll(@Query() query: ListClassInfoDto) {
+    const [results, total] = await this.classInfoService.findAll(query);
+    return new PaginatedVO<ClassInfoVO>({
+      pageNo: query.pageNo,
+      pageSize: query.pageSize,
+      total,
+      results,
+    });
   }
 
   @Get(':id')

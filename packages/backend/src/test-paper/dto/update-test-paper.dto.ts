@@ -1,11 +1,11 @@
-import { PartialType } from '@nestjs/swagger';
+import { OmitType, PartialType } from '@nestjs/swagger';
 import { CreateTestPaperDto, QuestionGroupDto } from './create-test-paper.dto';
 import {
+  ArrayMinSize,
   IsArray,
   IsNotEmpty,
   IsOptional,
   IsString,
-  MinLength,
 } from 'class-validator';
 
 export class UpdateQuestionGroupDto extends QuestionGroupDto {
@@ -14,13 +14,15 @@ export class UpdateQuestionGroupDto extends QuestionGroupDto {
   id?: string;
 }
 
-export class UpdateTestPaperDto extends PartialType(CreateTestPaperDto) {
+export class UpdateTestPaperDto extends PartialType(
+  OmitType(CreateTestPaperDto, ['createdUser']),
+) {
   @IsString()
   @IsNotEmpty()
   id: string;
 
   @IsArray()
   @IsNotEmpty()
-  @MinLength(1)
+  @ArrayMinSize(1)
   questionGroups: UpdateQuestionGroupDto[];
 }

@@ -1,15 +1,15 @@
 import {
   Column,
   Entity,
-  ManyToMany,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
   JoinTable,
+  CreateDateColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { QuestionGroup } from './question-group.entity';
 import { User } from '../../user/entities/user.entity';
-import { ClassInfo } from '../../class-info/entities/class-info.entity';
 import { Subject } from '../../subject/entities/subject.entity';
 import { Answer } from '../../answer/entities/answer.entity';
 
@@ -39,4 +39,10 @@ export class TestPaper {
 
   @Column()
   minute: number;
+
+  @CreateDateColumn()
+  createdDate: Date;
+
+  @UpdateDateColumn()
+  updateDate: Date;
 }

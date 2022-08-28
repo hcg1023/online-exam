@@ -6,6 +6,7 @@ import {
   JoinColumn,
   ManyToOne,
   CreateDateColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { Password } from './password.entity';
 import {
@@ -100,4 +101,7 @@ export class User {
 
   @CreateDateColumn()
   createdDate: Date;
+
+  @UpdateDateColumn()
+  updateDate: Date;
 }

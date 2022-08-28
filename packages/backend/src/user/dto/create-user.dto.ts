@@ -10,7 +10,12 @@ import {
   Length,
   Max,
   Min,
+  ValidateIf,
 } from 'class-validator';
+
+function validateIsStudent(obj: CreateUserDto) {
+  return obj.identity === IdentityEnum.STUDENT;
+}
 
 export class CreateUserDto {
   @IsNotEmpty()
@@ -46,14 +51,17 @@ export class CreateUserDto {
   @IsEnum(UserStatusEnum)
   status?: UserStatusEnum;
 
+  @ValidateIf(validateIsStudent)
   @IsNotEmpty()
   @IsEmail()
   email: string;
 
+  @ValidateIf(validateIsStudent)
   @IsNotEmpty()
   @IsString()
   grade: string;
 
+  @ValidateIf(validateIsStudent)
   @IsNotEmpty()
   @IsString()
   classInfo: string;

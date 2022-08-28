@@ -10,7 +10,6 @@ import { QuestionModule } from './question/question.module';
 import { ClassInfoModule } from './class-info/class-info.module';
 import { SubjectModule } from './subject/subject.module';
 import { GradeModule } from './grade/grade.module';
-import { TaskModule } from './task/task.module';
 import { AnswerModule } from './answer/answer.module';
 
 @Module({
@@ -34,7 +33,6 @@ import { AnswerModule } from './answer/answer.module';
     ClassInfoModule,
     SubjectModule,
     GradeModule,
-    TaskModule,
     AnswerModule,
   ],
   controllers: [AppController],

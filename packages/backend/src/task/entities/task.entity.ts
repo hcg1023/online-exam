@@ -1,10 +1,12 @@
 import {
   Column,
+  CreateDateColumn,
   Entity,
   JoinTable,
   ManyToMany,
   ManyToOne,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { Grade } from '../../grade/entities/grade.entity';
 import { TestPaper } from '../../test-paper/entities/test-paper.entity';
@@ -25,4 +27,10 @@ export class Task {
   @ManyToMany(() => TestPaper)
   @JoinTable()
   testPapers: TestPaper[];
+
+  @CreateDateColumn()
+  createdDate: Date;
+
+  @UpdateDateColumn()
+  updateDate: Date;
 }

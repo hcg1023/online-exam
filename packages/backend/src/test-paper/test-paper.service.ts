@@ -1,16 +1,20 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { CreateTestPaperDto } from './dto/create-test-paper.dto';
 import { UpdateTestPaperDto } from './dto/update-test-paper.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 import { TestPaper } from './entities/test-paper.entity';
 import { QuestionGroup } from './entities/question-group.entity';
+import { plainToInstance } from 'class-transformer';
+import { TestPaperVO } from './entities/test-paper.vo.entity';
+import { ListTestPaperDto } from './dto/list-test-paper.dto';
+import { getRepositoryPaginationParams } from '../common/paginated.dto';
 
 @Injectable()
 export class TestPaperService {
   constructor(
     @InjectRepository(TestPaper)
-    private testPapersRepository: Repository<TestPaper>,
+    public testPapersRepository: Repository<TestPaper>,
     @InjectRepository(QuestionGroup)
     private questionGroupRepository: Repository<QuestionGroup>,
   ) {}
@@ -18,12 +22,18 @@ export class TestPaperService {
   async create(createTestPaperDto: CreateTestPaperDto) {
     const { questionGroups, subject, createdUser, ...createTestPaper } =
       createTestPaperDto;
-    const newQuestionGroups = questionGroups.map(
-      this.questionGroupRepository.create,
+    const newQuestionGroups = questionGroups.map((item) =>
+      this.questionGroupRepository.create({
+        ...item,
+        questions: item.questions.map((id) => ({ id })),
+      }),
     );
-    const { id } = await this.testPapersRepository.create({
+    const questionGroupsCreated = await this.questionGroupRepository.save(
+      newQuestionGroups,
+    );
+    const testPaperCreated = await this.testPapersRepository.create({
       ...createTestPaper,
-      questionGroups: newQuestionGroups,
+      questionGroups: questionGroupsCreated,
       subject: {
         id: subject,
       },
@@ -31,15 +41,34 @@ export class TestPaperService {
         id: createdUser,
       },
     });
+    const { id } = await this.testPapersRepository.save(testPaperCreated);
     return this.findOne(id);
   }
 
-  findAll() {
-    return `This action returns all testPaper`;
+  async findAll(query: ListTestPaperDto): Promise<[TestPaperVO[], number]> {
+    const [list, total] = await this.testPapersRepository.findAndCount({
+      where: {
+        title: query.title ? Like(`%${query.title}%`) : null,
+        subject: query.subject ? { id: query.subject } : null,
+        createdUser: query.createdUser ? { id: query.createdUser } : null,
+      },
+      relations: {
+        subject: true,
+        questionGroups: {
+          questions: true,
+        },
+        createdUser: true,
+      },
+      order: {
+        createdDate: 'DESC',
+      },
+      ...getRepositoryPaginationParams(query),
+    });
+    return [plainToInstance(TestPaperVO, list), total];
   }
 
   async findOne(id: string) {
-    await this.testPapersRepository.findOne({
+    const testPaper = await this.testPapersRepository.findOne({
       where: {
         id,
       },
@@ -51,14 +80,48 @@ export class TestPaperService {
         createdUser: true,
       },
     });
-    return `This action returns a #${id} testPaper`;
+    return plainToInstance(TestPaperVO, testPaper);
   }
 
-  update(updateTestPaperDto: UpdateTestPaperDto) {
-    return `This action updates a # testPaper`;
+  async update(updateTestPaperDto: UpdateTestPaperDto) {
+    const { questionGroups, id, subject, ...updateTestPaper } =
+      updateTestPaperDto;
+    const testPaper = await this.testPapersRepository.findOne({
+      where: {
+        id,
+      },
+      relations: {
+        questionGroups: true,
+      },
+    });
+    const newQuestionGroups = questionGroups.map((item) =>
+      this.questionGroupRepository.create({
+        ...item,
+        questions: item.questions.map((id) => ({ id })),
+      }),
+    );
+    const questionGroupsCreated = await this.questionGroupRepository.save(
+      newQuestionGroups,
+    );
+    testPaper.questionGroups = questionGroupsCreated;
+    Object.assign(testPaper, updateTestPaper);
+    await this.questionGroupRepository.save(testPaper);
+    return this.findOne(id);
   }
 
-  remove(id: string) {
-    return `This action removes a #${id} testPaper`;
+  async remove(id: string) {
+    const testPaper = await this.testPapersRepository.findOne({
+      where: {
+        id,
+      },
+      relations: {
+        questionGroups: true,
+      },
+    });
+    if (!testPaper) {
+      throw new InternalServerErrorException('test-paper is not defined');
+    }
+    await this.testPapersRepository.remove(testPaper);
+    return true;
   }
 }

@@ -1,4 +1,11 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import { Answer } from './answer.entity';
 import { User } from '../../user/entities/user.entity';
 import { Question } from '../../question/entities/question.entity';
@@ -43,4 +50,10 @@ export class QuestionAnswer {
   // 批改教师
   @ManyToOne(() => User)
   correctTeacher: User;
+
+  @CreateDateColumn()
+  createdDate: Date;
+
+  @UpdateDateColumn()
+  updateDate: Date;
 }

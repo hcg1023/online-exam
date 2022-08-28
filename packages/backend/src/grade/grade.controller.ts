@@ -22,6 +22,7 @@ import {
 import { GradeVO } from './entities/grade.vo.entity';
 import { ListGradeDto } from './dto/list-grade.dto';
 import { SubjectBaseVO } from '../subject/entities/subject.vo.entity';
+import { PaginatedVO } from '../common/paginated.vo.entity';
 
 @ApiBearerAuth()
 @ApiTags('Grade 年级')
@@ -38,8 +39,14 @@ export class GradeController {
 
   @Get('list')
   @ApiPaginatedResponse(GradeVO)
-  findAll(@Query() query: ListGradeDto) {
-    return this.gradeService.findAll(query);
+  async findAll(@Query() query: ListGradeDto) {
+    const [results, total] = await this.gradeService.findAll(query);
+    return new PaginatedVO<GradeVO>({
+      pageNo: query.pageNo,
+      pageSize: query.pageSize,
+      results,
+      total,
+    });
   }
 
   @Get('subjects')
