@@ -1,20 +1,19 @@
-import {
-  ClassSerializerInterceptor,
-  HttpException,
-  Injectable,
-  UseInterceptors,
-} from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
-import { Repository } from 'typeorm';
+import { Equal, Repository } from 'typeorm';
 import { Password } from './entities/password.entity';
 import { FindOptionsWhere } from 'typeorm/find-options/FindOptionsWhere';
 import { encrypt } from '../common/bcrypt';
 import { GradeService } from '../grade/grade.service';
 import { ClassInfoService } from '../class-info/class-info.service';
 import { UserVO } from './entities/user.vo.entity';
+import { plainToInstance } from 'class-transformer';
+import { IdentityEnum } from '../enums';
+import { UserListDto } from './dto/user-list.dto';
+import { getRepositoryPaginationParams } from '../common/paginated.dto';
 
 @Injectable()
 export class UserService {
@@ -30,7 +29,7 @@ export class UserService {
   async create(createUserDto: CreateUserDto) {
     const hasUser = await this.findOne(createUserDto.username);
     if (hasUser) {
-      return new HttpException('用户名已存在', 200);
+      return new HttpException('用户名已存在', 500);
     }
     const password = await this.passwordsRepository.save({
       value: encrypt(createUserDto.password),
@@ -48,11 +47,23 @@ export class UserService {
       },
       password,
     });
-    return user;
+    return this.findOne(user.id);
   }
 
   async findAll() {
-    return this.usersRepository.find();
+    const list = await this.usersRepository.find();
+    return plainToInstance(UserVO, list);
+  }
+
+  async findUserList(identity: IdentityEnum, query: UserListDto) {
+    const list = await this.usersRepository.find({
+      where: {
+        identity: Equal(`${identity}`) as any,
+      },
+      ...getRepositoryPaginationParams(query),
+    });
+
+    return plainToInstance(UserVO, list);
   }
 
   async findOne(idOrName: number | string): Promise<UserVO> {
@@ -66,20 +77,14 @@ export class UserService {
       where,
       relations: {
         password: true,
-        grade: {
-          subjects: false,
-          classInfos: false,
-        },
-        classInfo: {
-          grade: false,
-          testPapers: false,
-        },
+        grade: true,
+        classInfo: true,
       },
     });
     if (!user) {
       return null;
     }
-    return new UserVO(user);
+    return plainToInstance(UserVO, user);
   }
 
   async update(updateUserDto: UpdateUserDto) {
@@ -101,10 +106,19 @@ export class UserService {
           : undefined,
       },
     );
-    return true;
+    return this.findOne(updateUserDto.id);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async remove(id: number) {
+    const user = await this.usersRepository.findOne({
+      where: {
+        id,
+      },
+    });
+    if (!user) {
+      throw new HttpException('user is not defined', 500);
+    }
+    await this.usersRepository.remove(user);
+    return true;
   }
 }

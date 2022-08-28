@@ -9,17 +9,18 @@ import { QuestionTypeEnum } from '../../enums';
 import { QuestionGroup } from '../../test-paper/entities/question-group.entity';
 import { Subject } from '../../subject/entities/subject.entity';
 import { Grade } from '../../grade/entities/grade.entity';
+import { QuestionOption } from './question-option.entity';
 
 @Entity()
 export class Question {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+  @PrimaryGeneratedColumn()
+  id: number;
 
   @Column({
     type: 'enum',
     enum: QuestionTypeEnum,
   })
-  type: string;
+  type: QuestionTypeEnum;
 
   // 题目
   @Column()
@@ -49,19 +50,23 @@ export class Question {
   @Column({
     type: 'json',
   })
-  options: string;
+  options: QuestionOption[];
 
   // 单选，多选，判断的正确选项
   @Column({
     type: 'json',
   })
-  correctOptions: string;
+  correctOptions: string[];
 
   // 填空题和简答题的答案
-  @Column()
+  @Column({
+    default: '',
+  })
   answer: string;
 
   // 题目解析
-  @Column()
+  @Column({
+    default: '',
+  })
   analyze: string;
 }

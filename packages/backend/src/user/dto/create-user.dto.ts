@@ -1,5 +1,5 @@
 import { IdentityEnum, SexEnum, UserStatusEnum } from '../../enums';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiHideProperty, ApiProperty } from '@nestjs/swagger';
 import {
   IsEmail,
   IsEmpty,
@@ -59,5 +59,6 @@ export class CreateUserDto {
   classInfo: string;
 
   @IsEmpty()
+  @ApiHideProperty()
   createdUser: number;
 }

@@ -1,26 +1,66 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { CreateSubjectDto } from './dto/create-subject.dto';
 import { UpdateSubjectDto } from './dto/update-subject.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Subject } from './entities/subject.entity';
+import { Like, Repository } from 'typeorm';
+import { plainToInstance } from 'class-transformer';
+import { SubjectBaseVO } from './entities/subject.vo.entity';
+import { ListSubjectDto } from './dto/list-subject.dto';
+import { getRepositoryPaginationParams } from '../common/paginated.dto';
 
 @Injectable()
 export class SubjectService {
-  create(createSubjectDto: CreateSubjectDto) {
-    return 'This action adds a new subject';
+  constructor(
+    @InjectRepository(Subject) public subjectsRepository: Repository<Subject>,
+  ) {}
+
+  async create(createSubjectDto: CreateSubjectDto) {
+    const subject = await this.subjectsRepository.save(createSubjectDto);
+    return plainToInstance(SubjectBaseVO, subject);
   }
 
-  findAll() {
-    return `This action returns all subject`;
+  async findAll(query: ListSubjectDto) {
+    const list = await this.subjectsRepository.find({
+      where: {
+        name: query.name ? Like(`%${query.name}%`) : null,
+      },
+      ...getRepositoryPaginationParams(query),
+    });
+    return plainToInstance(SubjectBaseVO, list);
   }
 
-  findOne(id: string) {
-    return `This action returns a #${id} subject`;
+  async findOne(id: string) {
+    const subject = await this.subjectsRepository.findOne({
+      where: {
+        id,
+      },
+    });
+    return plainToInstance(SubjectBaseVO, subject);
   }
 
-  update(updateSubjectDto: UpdateSubjectDto) {
-    return `This action updates a #${updateSubjectDto.id} subject`;
+  async update(updateSubjectDto: UpdateSubjectDto) {
+    await this.subjectsRepository.update(
+      {
+        id: updateSubjectDto.id,
+      },
+      {
+        ...updateSubjectDto,
+      },
+    );
+    return this.findOne(updateSubjectDto.id);
   }
 
-  remove(id: string) {
-    return `This action removes a #${id} subject`;
+  async remove(id: string) {
+    const subject = await this.subjectsRepository.findOne({
+      where: {
+        id,
+      },
+    });
+    if (!subject) {
+      throw new InternalServerErrorException('subject is not defined');
+    }
+    await this.subjectsRepository.remove(subject);
+    return true;
   }
 }

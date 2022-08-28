@@ -1,4 +1,10 @@
-import { IsArray, IsNotEmpty, IsString, Length } from 'class-validator';
+import {
+  IsArray,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  Length,
+} from 'class-validator';
 
 export class CreateGradeDto {
   @IsNotEmpty()
@@ -7,8 +13,6 @@ export class CreateGradeDto {
   title: string;
 
   @IsArray()
-  subjects: string[];
-
-  @IsArray()
-  classInfos: string[];
+  @IsOptional()
+  subjects?: string[];
 }

@@ -15,11 +15,17 @@ export class Grade {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column()
+  @Column({
+    unique: true,
+  })
   title: string;
 
   // 科目
-  @ManyToMany(() => Subject, (subject) => subject.grades)
+  @ManyToMany(() => Subject, (subject) => subject.grades, {
+    cascade: true,
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
   @JoinTable()
   subjects: Subject[];
 

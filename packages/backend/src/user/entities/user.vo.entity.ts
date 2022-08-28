@@ -7,11 +7,11 @@ import {
   UserStatusFormatterEnum,
 } from '../../enums';
 import { ApiHideProperty, ApiProperty } from '@nestjs/swagger';
-import { ClassInfo } from '../../class-info/entities/class-info.entity';
-import { GradeVO } from '../../grade/entities/grade.vo.entity';
+import { GradeBaseVO } from '../../grade/entities/grade.vo.entity';
+import { ClassInfoBaseVO } from '../../class-info/entities/class-info.vo.entity';
 
 export class UserVO {
-  id: string;
+  id: number;
 
   username: string;
 
@@ -51,9 +51,9 @@ export class UserVO {
 
   createdDate: Date;
 
-  grade: GradeVO;
+  grade: GradeBaseVO;
 
-  classInfo: ClassInfo;
+  classInfo: ClassInfoBaseVO;
 
   constructor(props) {
     Object.assign(this, props);

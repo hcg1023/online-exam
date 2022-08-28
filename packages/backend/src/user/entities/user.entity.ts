@@ -11,6 +11,7 @@ import { Password } from './password.entity';
 import {
   IdentityEnum,
   IdentityFormatterEnum,
+  SexEnum,
   SexEnumFormatterEnum,
   UserStatusEnum,
   UserStatusFormatterEnum,
@@ -25,7 +26,9 @@ export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({
+    unique: true,
+  })
   username: string;
 
   @OneToOne(() => Password)
@@ -41,8 +44,11 @@ export class User {
   @Column()
   age: number;
 
-  @Column()
-  sex: string;
+  @Column({
+    type: 'enum',
+    enum: SexEnum,
+  })
+  sex: SexEnum;
 
   @Expose()
   get sexName() {
@@ -54,7 +60,7 @@ export class User {
     enum: UserStatusEnum,
     default: UserStatusEnum.ENABLE,
   })
-  status: string;
+  status: UserStatusEnum;
 
   @Expose()
   get useStatusName() {
@@ -82,7 +88,9 @@ export class User {
   grade: Grade;
 
   // 多个学生对应一个班级
-  @ManyToOne(() => ClassInfo, (classInfo) => classInfo.students)
+  @ManyToOne(() => ClassInfo, (classInfo) => classInfo.students, {
+    onDelete: 'CASCADE',
+  })
   @Type(() => ClassInfo)
   classInfo: ClassInfo;
 
