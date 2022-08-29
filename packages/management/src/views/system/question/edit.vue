@@ -4,38 +4,119 @@
  * @Version: 1.0
  * @LastEditors: @yzcheng
  * @Description: 班级 新增编辑
- * @LastEditTime: 2022-08-28 19:52:01
+ * @LastEditTime: 2022-08-28 20:58:27
 -->
 <template>
   <el-dialog
-    width="30%"
+    width="50%"
     v-model="dialogVisible"
     :title="dictionary[type]"
     @close="handleAddUpdCancel"
   >
     <div class="dept-editor">
       <div class="wrap-box">
-        <el-form ref="ruleFormRef" label-width="100px" :model="formState" :rules="rules">
+        <el-form
+          ref="ruleFormRef"
+          label-width="100px"
+          :model="formState"
+          :rules="rules"
+        >
           <el-row>
             <el-col :span="24">
-              <el-form-item label="班级名称" prop="name">
-                <el-input
-                  :disabled="isDisabled"
-                  v-model="formState.name"
-                  placeholder="请输入班级名称"
-                />
+              <el-form-item label="创编类型" prop="name">
+                <el-select placeholder="请选择创编类型">
+                  <el-option
+                    v-for="{ key, name } in topicType"
+                    :key="key"
+                    :label="name"
+                    :value="key"
+                  />
+                </el-select>
               </el-form-item>
             </el-col>
             <el-col :span="24">
-              <el-form-item label="年级名称" prop="grade">
-                <el-select v-model="formState.grade" placeholder="请选择学科">
+              <el-form-item label="年级" prop="grade">
+                <el-select v-model="formState.grade" placeholder="请选择年级">
                   <el-option
-                    v-for="{ id, title } in gradeList"
+                    v-for="{ id, title } in topicType"
                     :key="id"
                     :label="title"
                     :value="id"
                   />
                 </el-select>
+              </el-form-item>
+            </el-col>
+            <el-col :span="24">
+              <el-form-item label="学科" prop="grade">
+                <el-select v-model="formState.grade" placeholder="请选择学科">
+                  <el-option
+                    v-for="{ id, title } in topicType"
+                    :key="id"
+                    :label="title"
+                    :value="id"
+                  />
+                </el-select>
+              </el-form-item>
+            </el-col>
+            <el-col :span="24">
+              <el-form-item label="题干" prop="grade">
+                <el-input
+                  v-model="formState.title"
+                  placeholder="请输入题干名称"
+                />
+              </el-form-item>
+            </el-col>
+            <el-col :span="24">
+              <el-form-item label="选项" style="width:100%" prop="grade">
+                <div class="topic_options">
+                  <el-input
+                    v-model="formState.title"
+                    style="width:100px"
+                    placeholder="请输入选项"
+                  />
+                  <el-input
+                    v-model="formState.title"
+                    placeholder="请输入选项内容"
+                  />
+                </div>
+              </el-form-item>
+            </el-col>
+            <el-col :span="24">
+              <el-form-item label="标答" prop="grade">
+                <el-checkbox-group v-model="formState.checkList">
+                  <el-checkbox label="A" />
+                  <el-checkbox label="B" />
+                  <el-checkbox label="C" />
+                  <el-checkbox label="D" />
+                </el-checkbox-group>
+              </el-form-item>
+            </el-col>
+            <el-col :span="24">
+              <el-form-item label="解析" prop="grade">
+                <el-input
+                  type="textarea"
+                  v-model="formState.title"
+                  placeholder="请写解析"
+                />
+              </el-form-item>
+            </el-col>
+            <el-col :span="24">
+              <el-form-item label="分数" prop="grade">
+                <el-input-number v-model="formState.num" :min="1" :max="100" />
+              </el-form-item>
+            </el-col>
+            <el-col :span="24">
+              <el-form-item label="难度" prop="grade">
+                <el-rate v-model="formState.difficulty" />
+              </el-form-item>
+            </el-col>
+            <el-col :span="24">
+              <el-form-item label="知识点" prop="grade">
+                <el-input
+                  type="textarea"
+                  v-model="formState.title"
+                  placeholder="请输入"
+                />
               </el-form-item>
             </el-col>
           </el-row>
@@ -79,11 +160,37 @@ import {
   getCurrentInstance
 } from "vue";
 import type { responseData } from "/#/index";
-import { updateQuestionList, findQuestionDetailed, addQuestionList } from "./services";
+import {
+  updateQuestionList,
+  findQuestionDetailed,
+  addQuestionList
+} from "./services";
 import { message } from "@pureadmin/components";
 import { getGradeList } from "/@/api/system";
 import type { FormInstance, FormRules } from "element-plus";
 const ruleFormRef = ref<FormInstance>();
+const topicType = [
+  {
+    key: 1,
+    name: "单选题创编"
+  },
+  {
+    key: 2,
+    name: "多选题创编"
+  },
+  {
+    key: 3,
+    name: "判断题创编"
+  },
+  {
+    key: 4,
+    name: "填空题创编"
+  },
+  {
+    key: 5,
+    name: "简答题创编"
+  }
+];
 const { ctx }: any = getCurrentInstance();
 const props = defineProps({
   visible: {
@@ -181,7 +288,7 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
       } else {
         insertRegulatory(data);
       }
-    }else{
+    } else {
       loading.value = false;
     }
   });
@@ -205,6 +312,10 @@ onMounted(async () => {
 </script>
 
 <style scoped lang="scss">
+.topic_options{
+  display: flex;
+  justify-content: space-around;
+}
 .dept-editor {
   width: 100%;
   height: 100%;
