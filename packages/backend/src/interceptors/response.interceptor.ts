@@ -30,7 +30,7 @@ export class ResponseInterceptor<T>
         const responseVO = new ResponseVO<T>();
         responseVO.code = HttpStatus.OK;
         responseVO.data = data;
-        responseVO.message = '';
+        responseVO.message = 'success';
         return responseVO;
       }),
     );

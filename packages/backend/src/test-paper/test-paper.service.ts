@@ -104,7 +104,7 @@ export class TestPaperService {
       newQuestionGroups,
     );
     testPaper.questionGroups = questionGroupsCreated;
-    Object.assign(testPaper, updateTestPaper);
+    this.testPapersRepository.merge(testPaper, updateTestPaper);
     await this.questionGroupRepository.save(testPaper);
     return this.findOne(id);
   }

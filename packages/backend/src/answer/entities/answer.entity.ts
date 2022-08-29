@@ -2,6 +2,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinTable,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -40,6 +41,7 @@ export class Answer {
     () => QuestionAnswer,
     (questionAnswer) => questionAnswer.answerGroup,
   )
+  @JoinTable()
   questionAnswers: QuestionAnswer[];
 
   // 作答的学生

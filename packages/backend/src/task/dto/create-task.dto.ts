@@ -1,4 +1,10 @@
-import { ArrayMinSize, IsArray, IsNotEmpty, IsString } from 'class-validator';
+import {
+  ArrayMinSize,
+  IsArray,
+  IsNotEmpty,
+  IsNumber,
+  IsString,
+} from 'class-validator';
 
 export class CreateTaskDto {
   @IsString()
@@ -12,4 +18,10 @@ export class CreateTaskDto {
   @IsArray()
   @ArrayMinSize(1)
   testPapers: string[];
+
+  @IsNumber()
+  startDate?: number;
+
+  @IsNumber()
+  endDate?: number;
 }

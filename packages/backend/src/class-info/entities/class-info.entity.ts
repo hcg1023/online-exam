@@ -15,7 +15,9 @@ export class ClassInfo {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column()
+  @Column({
+    default: '',
+  })
   name: string;
 
   // 年级

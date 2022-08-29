@@ -23,6 +23,7 @@ import {
   ApiPaginatedResponse,
 } from '../decorators/response.decorator';
 import { PaginatedVO } from '../common/paginated.vo.entity';
+import { UpdatePasswordDto } from './dto/update-password.dto';
 
 @ApiBearerAuth()
 @ApiTags('User 用户')
@@ -45,6 +46,7 @@ export class UserController {
   }
 
   @Get('list')
+  @Roles(IdentityEnum.ADMIN, IdentityEnum.TEACHER)
   @ApiPaginatedResponse(UserVO)
   findAll() {
     return this.userService.findAll();
@@ -64,18 +66,21 @@ export class UserController {
   }
 
   @Get('admin/list')
+  @Roles(IdentityEnum.ADMIN)
   @ApiPaginatedResponse(UserVO)
   async getAdminList(@Query() query: UserListDto) {
     return this.getListWhereIdentity(IdentityEnum.ADMIN, query);
   }
 
   @Get('teacher/list')
+  @Roles(IdentityEnum.ADMIN)
   @ApiPaginatedResponse(UserVO)
   async getTeacherList(@Query() query: UserListDto) {
     return this.getListWhereIdentity(IdentityEnum.TEACHER, query);
   }
 
   @Get('student/list')
+  @Roles(IdentityEnum.ADMIN, IdentityEnum.TEACHER)
   @ApiPaginatedResponse(UserVO)
   async getStudentList(@Query() query: UserListDto) {
     return this.getListWhereIdentity(IdentityEnum.STUDENT, query);
@@ -97,6 +102,12 @@ export class UserController {
   @ApiBaseResponse(UserVO)
   update(@Body() updateUserDto: UpdateUserDto) {
     return this.userService.update(updateUserDto);
+  }
+
+  @Post('update/password')
+  @ApiBooleanResponse()
+  updatePassword(@Body() updatePasswordDto: UpdatePasswordDto) {
+    return this.userService.updatePassword(updatePasswordDto);
   }
 
   @Roles(IdentityEnum.ADMIN, IdentityEnum.TEACHER)

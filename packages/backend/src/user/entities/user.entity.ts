@@ -39,10 +39,14 @@ export class User {
   @Type(() => Password)
   password: Password;
 
-  @Column()
+  @Column({
+    default: '',
+  })
   name: string;
 
-  @Column()
+  @Column({
+    default: 0,
+  })
   age: number;
 
   @Column({
@@ -90,6 +94,8 @@ export class User {
 
   // 多个学生对应一个班级
   @ManyToOne(() => ClassInfo, (classInfo) => classInfo.students, {
+    cascade: true,
+    onUpdate: 'CASCADE',
     onDelete: 'CASCADE',
   })
   @Type(() => ClassInfo)

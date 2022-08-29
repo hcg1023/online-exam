@@ -1,12 +1,16 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import {
+  HttpException,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
-import { Equal, Repository } from 'typeorm';
+import { Equal, Like, Repository } from 'typeorm';
 import { Password } from './entities/password.entity';
 import { FindOptionsWhere } from 'typeorm/find-options/FindOptionsWhere';
-import { encrypt } from '../common/bcrypt';
+import { compare, encrypt } from '../common/bcrypt';
 import { GradeService } from '../grade/grade.service';
 import { ClassInfoService } from '../class-info/class-info.service';
 import { UserVO } from './entities/user.vo.entity';
@@ -14,6 +18,7 @@ import { plainToInstance } from 'class-transformer';
 import { IdentityEnum } from '../enums';
 import { UserListDto } from './dto/user-list.dto';
 import { getRepositoryPaginationParams } from '../common/paginated.dto';
+import { UpdatePasswordDto } from './dto/update-password.dto';
 
 @Injectable()
 export class UserService {
@@ -29,7 +34,7 @@ export class UserService {
   async create(createUserDto: CreateUserDto) {
     const hasUser = await this.findOne(createUserDto.username);
     if (hasUser) {
-      return new HttpException('用户名已存在', 500);
+      throw new InternalServerErrorException('用户名已存在');
     }
     const password = await this.passwordsRepository.save({
       value: encrypt(createUserDto.password),
@@ -62,7 +67,16 @@ export class UserService {
     const [list, total] = await this.usersRepository.findAndCount({
       where: {
         identity: Equal(`${identity}`) as any,
+        username: query.username ? Like(`%${query.username}%`) : null,
+        name: query.name ? Like(`%${query.name}%`) : null,
       },
+      relations:
+        identity === IdentityEnum.STUDENT
+          ? {
+              classInfo: true,
+              grade: true,
+            }
+          : undefined,
       order: {
         createdDate: 'DESC',
       },
@@ -114,6 +128,29 @@ export class UserService {
       },
     );
     return this.findOne(updateUserDto.id);
+  }
+
+  async updatePassword(updatePasswordDto: UpdatePasswordDto) {
+    const oldUser = await this.usersRepository.findOne({
+      where: {
+        id: updatePasswordDto.id,
+      },
+      relations: {
+        password: true,
+      },
+    });
+    if (!oldUser) {
+      throw new InternalServerErrorException('user is not defined');
+    }
+    if (!compare(updatePasswordDto.oldPassword, oldUser.password.value)) {
+      throw new InternalServerErrorException('密码错误');
+    }
+    const newPassword = await this.passwordsRepository.save({
+      value: updatePasswordDto.newPassword,
+    });
+    oldUser.password = newPassword;
+    await this.usersRepository.save(oldUser);
+    return true;
   }
 
   async remove(id: number) {
