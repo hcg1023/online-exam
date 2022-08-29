@@ -6,7 +6,6 @@ import {
   Post,
   Query,
   UnauthorizedException,
-  ValidationPipe,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -23,6 +22,7 @@ import {
   ApiBooleanResponse,
   ApiPaginatedResponse,
 } from '../decorators/response.decorator';
+import { PaginatedVO } from '../common/paginated.vo.entity';
 
 @ApiBearerAuth()
 @ApiTags('User 用户')
@@ -50,22 +50,35 @@ export class UserController {
     return this.userService.findAll();
   }
 
+  async getListWhereIdentity(identity: IdentityEnum, query: UserListDto) {
+    const [results, total] = await this.userService.findUserList(
+      identity,
+      query,
+    );
+    return new PaginatedVO<UserVO>({
+      pageNo: query.pageNo,
+      pageSize: query.pageSize,
+      total,
+      results,
+    });
+  }
+
   @Get('admin/list')
   @ApiPaginatedResponse(UserVO)
-  getAdminList(@Query() query: UserListDto) {
-    return this.userService.findUserList(IdentityEnum.ADMIN, query);
+  async getAdminList(@Query() query: UserListDto) {
+    return this.getListWhereIdentity(IdentityEnum.ADMIN, query);
   }
 
   @Get('teacher/list')
   @ApiPaginatedResponse(UserVO)
-  getTeacherList(@Query() query: UserListDto) {
-    return this.userService.findUserList(IdentityEnum.TEACHER, query);
+  async getTeacherList(@Query() query: UserListDto) {
+    return this.getListWhereIdentity(IdentityEnum.TEACHER, query);
   }
 
   @Get('student/list')
   @ApiPaginatedResponse(UserVO)
-  getStudentList(@Query() query: UserListDto) {
-    return this.userService.findUserList(IdentityEnum.STUDENT, query);
+  async getStudentList(@Query() query: UserListDto) {
+    return this.getListWhereIdentity(IdentityEnum.STUDENT, query);
   }
 
   @Get('profile')

@@ -20,14 +20,17 @@ export class SubjectService {
     return plainToInstance(SubjectBaseVO, subject);
   }
 
-  async findAll(query: ListSubjectDto) {
-    const list = await this.subjectsRepository.find({
+  async findAll(query: ListSubjectDto): Promise<[SubjectBaseVO[], number]> {
+    const [list, total] = await this.subjectsRepository.findAndCount({
       where: {
         name: query.name ? Like(`%${query.name}%`) : null,
       },
+      order: {
+        createdDate: 'DESC',
+      },
       ...getRepositoryPaginationParams(query),
     });
-    return plainToInstance(SubjectBaseVO, list);
+    return [plainToInstance(SubjectBaseVO, list), total];
   }
 
   async findOne(id: string) {

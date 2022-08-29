@@ -1,4 +1,5 @@
 import {
+  ArrayMinSize,
   IsArray,
   IsEmpty,
   IsInt,
@@ -6,7 +7,6 @@ import {
   IsString,
   MinLength,
 } from 'class-validator';
-import { Exclude } from 'class-transformer';
 import { ApiHideProperty } from '@nestjs/swagger';
 
 export class QuestionGroupDto {
@@ -21,7 +21,7 @@ export class QuestionGroupDto {
   @IsArray()
   @IsNotEmpty()
   @MinLength(1)
-  questions: string[];
+  questions: number[];
 }
 
 export class CreateTestPaperDto {
@@ -35,7 +35,7 @@ export class CreateTestPaperDto {
 
   @IsArray()
   @IsNotEmpty()
-  @MinLength(1)
+  @ArrayMinSize(1)
   questionGroups: QuestionGroupDto[];
 
   @IsInt()

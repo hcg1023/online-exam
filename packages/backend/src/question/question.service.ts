@@ -25,8 +25,8 @@ export class QuestionService {
     return this.findOne(id);
   }
 
-  async findAll(query: ListQuestionDto) {
-    const list = await this.questionsRepository.find({
+  async findAll(query: ListQuestionDto): Promise<[QuestionVO[], number]> {
+    const [list, total] = await this.questionsRepository.findAndCount({
       where: {
         title: query.title ? Like(`%${query.title}%`) : null,
         id: query.id ? Equal(query.id) : null,
@@ -46,9 +46,12 @@ export class QuestionService {
         grade: true,
         subject: true,
       },
+      order: {
+        createdDate: 'DESC',
+      },
       ...getRepositoryPaginationParams(query),
     });
-    return plainToInstance(QuestionVO, list);
+    return [plainToInstance(QuestionVO, list), total];
   }
 
   async findOne(id: number) {

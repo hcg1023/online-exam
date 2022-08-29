@@ -55,15 +55,21 @@ export class UserService {
     return plainToInstance(UserVO, list);
   }
 
-  async findUserList(identity: IdentityEnum, query: UserListDto) {
-    const list = await this.usersRepository.find({
+  async findUserList(
+    identity: IdentityEnum,
+    query: UserListDto,
+  ): Promise<[UserVO[], number]> {
+    const [list, total] = await this.usersRepository.findAndCount({
       where: {
         identity: Equal(`${identity}`) as any,
+      },
+      order: {
+        createdDate: 'DESC',
       },
       ...getRepositoryPaginationParams(query),
     });
 
-    return plainToInstance(UserVO, list);
+    return [plainToInstance(UserVO, list), total];
   }
 
   async findOne(idOrName: number | string): Promise<UserVO> {
@@ -84,7 +90,8 @@ export class UserService {
     if (!user) {
       return null;
     }
-    return plainToInstance(UserVO, user);
+    // 不能使用plainInstance
+    return new UserVO(user);
   }
 
   async update(updateUserDto: UpdateUserDto) {

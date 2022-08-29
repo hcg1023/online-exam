@@ -27,8 +27,8 @@ export class ClassInfoService {
     return plainToInstance(ClassInfoVO, classInfo);
   }
 
-  async findAll(query?: ListClassInfoDto) {
-    const list = await this.classInfosRepository.find({
+  async findAll(query?: ListClassInfoDto): Promise<[ClassInfoVO[], number]> {
+    const [list, count] = await this.classInfosRepository.findAndCount({
       where: {
         name: query.name ? Like(`%${query.name}%`) : null,
       },
@@ -38,9 +38,12 @@ export class ClassInfoService {
           subjects: true,
         },
       },
+      order: {
+        createdDate: 'DESC',
+      },
       ...getRepositoryPaginationParams(query),
     });
-    return plainToInstance(ClassInfoVO, list);
+    return [plainToInstance(ClassInfoVO, list), count];
   }
 
   async findOne(id: string) {

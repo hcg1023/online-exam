@@ -9,14 +9,13 @@ import { plainToInstance } from 'class-transformer';
 import { ListGradeDto } from './dto/list-grade.dto';
 import { getRepositoryPaginationParams } from '../common/paginated.dto';
 import { SubjectBaseVO } from '../subject/entities/subject.vo.entity';
-import { Subject } from '../subject/entities/subject.entity';
 import { SubjectService } from '../subject/subject.service';
 
 @Injectable()
 export class GradeService {
   constructor(
     @InjectRepository(Grade)
-    private gradesRepository: Repository<Grade>,
+    public gradesRepository: Repository<Grade>,
     private subjectService: SubjectService,
   ) {}
 
@@ -28,8 +27,8 @@ export class GradeService {
     return plainToInstance(GradeVO, grade);
   }
 
-  async findAll(query: ListGradeDto) {
-    const list = await this.gradesRepository.find({
+  async findAll(query: ListGradeDto): Promise<[GradeVO[], number]> {
+    const [list, total] = await this.gradesRepository.findAndCount({
       where: {
         title: query.title ? Like(`%${query.title}%`) : null,
       },
@@ -39,9 +38,12 @@ export class GradeService {
           questions: false,
         },
       },
+      order: {
+        createdDate: 'DESC',
+      },
       ...getRepositoryPaginationParams(query),
     });
-    return plainToInstance(GradeVO, list);
+    return [plainToInstance(GradeVO, list), total];
   }
 
   async getGradeSubjects(id: string) {
@@ -97,11 +99,31 @@ export class GradeService {
       where: {
         id,
       },
+      relations: {
+        subjects: true,
+        classInfos: true,
+        questions: true,
+      },
     });
     if (!grade) {
       throw new InternalServerErrorException('grade is not defined');
     }
-    await this.gradesRepository.remove(grade);
+    if (grade.classInfos.length) {
+      throw new InternalServerErrorException(
+        '存在使用的班级，请解除关联再删除',
+      );
+    }
+    if (grade.questions.length) {
+      throw new InternalServerErrorException(
+        '存在关联的题目，请解除关联再删除',
+      );
+    }
+
+    try {
+      await this.gradesRepository.remove(grade);
+    } catch (e) {
+      throw new InternalServerErrorException(e.message);
+    }
     return true;
   }
 }

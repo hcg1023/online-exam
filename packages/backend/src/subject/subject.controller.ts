@@ -20,6 +20,7 @@ import {
   ApiPaginatedResponse,
 } from '../decorators/response.decorator';
 import { ListSubjectDto } from './dto/list-subject.dto';
+import { PaginatedVO } from '../common/paginated.vo.entity';
 
 @ApiBearerAuth()
 @ApiTags('Subject 学科')
@@ -36,8 +37,14 @@ export class SubjectController {
 
   @Get('list')
   @ApiPaginatedResponse(SubjectBaseVO)
-  findAll(@Query() query: ListSubjectDto) {
-    return this.subjectService.findAll(query);
+  async findAll(@Query() query: ListSubjectDto) {
+    const [results, total] = await this.subjectService.findAll(query);
+    return new PaginatedVO<SubjectBaseVO>({
+      pageNo: query.pageNo,
+      pageSize: query.pageSize,
+      results,
+      total,
+    });
   }
 
   @Get(':id')

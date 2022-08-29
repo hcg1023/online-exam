@@ -1,9 +1,11 @@
 import {
   Column,
+  CreateDateColumn,
   Entity,
   ManyToMany,
   ManyToOne,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { QuestionTypeEnum } from '../../enums';
 import { QuestionGroup } from '../../test-paper/entities/question-group.entity';
@@ -39,7 +41,7 @@ export class Question {
   difficulty: number;
 
   // 多个题目对应一个年级
-  @ManyToOne(() => Grade)
+  @ManyToOne(() => Grade, (grade) => grade.questions)
   grade: Grade;
 
   // 允许多个题目对应一个学科
@@ -69,4 +71,10 @@ export class Question {
     default: '',
   })
   analyze: string;
+
+  @CreateDateColumn()
+  createdDate: Date;
+
+  @UpdateDateColumn()
+  updateDate: Date;
 }

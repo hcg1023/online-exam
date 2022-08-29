@@ -9,5 +9,6 @@ import { QuestionGroup } from './entities/question-group.entity';
   imports: [TypeOrmModule.forFeature([TestPaper, QuestionGroup])],
   controllers: [TestPaperController],
   providers: [TestPaperService],
+  exports: [TestPaperService],
 })
 export class TestPaperModule {}

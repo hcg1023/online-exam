@@ -58,8 +58,25 @@ export const ApiPaginatedResponse = <TModel extends Type<any>>(
             type: 'string',
           },
           data: {
-            type: 'array',
-            items: { $ref: getSchemaPath(model) },
+            type: 'object',
+            properties: {
+              pageNo: {
+                type: 'number',
+                default: 1,
+              },
+              pageSize: {
+                type: 'number',
+                default: 1,
+              },
+              total: {
+                type: 'number',
+                default: 10,
+              },
+              results: {
+                type: 'array',
+                items: { $ref: getSchemaPath(model) },
+              },
+            },
           },
         },
       },

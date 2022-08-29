@@ -28,7 +28,7 @@ export class ResponseInterceptor<T>
         }
 
         const responseVO = new ResponseVO<T>();
-        responseVO.code = 200;
+        responseVO.code = HttpStatus.OK;
         responseVO.data = data;
         responseVO.message = '';
         return responseVO;
