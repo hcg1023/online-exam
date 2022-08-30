@@ -4,7 +4,7 @@
  * @Version: 1.0
  * @LastEditors: @yzcheng
  * @Description: 试题 新增编辑
- * @LastEditTime: 2022-08-30 18:49:40
+ * @LastEditTime: 2022-08-30 19:01:32
 -->
 <template>
   <el-dialog
@@ -73,7 +73,7 @@
                 />
               </el-form-item>
             </el-col>
-            <el-col :span="24" v-if="!['SHORT_ANSWER'].includes(getType)">
+            <el-col :span="24" v-if="!['SHORT_ANSWER','REPLY_QUESTION'].includes(getType)">
               <el-form-item label="选项" name="options">
                 <el-space wrap>
                   <div
