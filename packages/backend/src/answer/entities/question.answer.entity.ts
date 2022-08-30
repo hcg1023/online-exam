@@ -9,6 +9,7 @@ import {
 import { Answer } from './answer.entity';
 import { User } from '../../user/entities/user.entity';
 import { Question } from '../../question/entities/question.entity';
+import { QuestionOption } from '../../question/entities/question-option.entity';
 
 @Entity()
 export class QuestionAnswer {
@@ -19,7 +20,7 @@ export class QuestionAnswer {
   @Column({
     type: 'json',
   })
-  options: string;
+  options: string[];
 
   // 填空题和简答题的答案
   @Column()
@@ -40,7 +41,11 @@ export class QuestionAnswer {
   question: Question;
 
   // 题目答案对应的答案组
-  @ManyToOne(() => Answer, (answer) => answer.questionAnswers)
+  @ManyToOne(() => Answer, (answer) => answer.questionAnswers, {
+    cascade: true,
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
   answerGroup: Answer;
 
   // 创建用户

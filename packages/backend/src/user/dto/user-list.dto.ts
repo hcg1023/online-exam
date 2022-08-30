@@ -5,4 +5,8 @@ export class UserListDto extends PaginatedDto {
   @IsString()
   @IsOptional()
   username?: string;
+
+  @IsString()
+  @IsOptional()
+  name?: string;
 }

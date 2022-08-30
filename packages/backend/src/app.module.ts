@@ -11,6 +11,8 @@ import { ClassInfoModule } from './class-info/class-info.module';
 import { SubjectModule } from './subject/subject.module';
 import { GradeModule } from './grade/grade.module';
 import { AnswerModule } from './answer/answer.module';
+import { ScheduleModule } from '@nestjs/schedule';
+import { StudentModule } from './student/student.module';
 
 @Module({
   imports: [
@@ -25,6 +27,7 @@ import { AnswerModule } from './answer/answer.module';
       synchronize: true,
       timezone: '+08:00',
     }),
+    ScheduleModule.forRoot(),
     UserModule,
     AuthModule,
     RoleModule,
@@ -34,6 +37,7 @@ import { AnswerModule } from './answer/answer.module';
     SubjectModule,
     GradeModule,
     AnswerModule,
+    StudentModule,
   ],
   controllers: [AppController],
   providers: [AppService],

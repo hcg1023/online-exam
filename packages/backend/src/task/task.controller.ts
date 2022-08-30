@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Param, Query } from '@nestjs/common';
 import { TaskService } from './task.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
-import { ApiBearerAuth, ApiExcludeController, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { ListTaskDto } from './dto/list-task.dto';
 import {
   ApiBaseResponse,
@@ -11,9 +11,12 @@ import {
 } from '../decorators/response.decorator';
 import { TaskVO } from './entities/task.vo.entity';
 import { PaginatedVO } from '../common/paginated.vo.entity';
+import { Roles } from '../role/role.decorator';
+import { IdentityEnum } from '../enums';
 
 @ApiBearerAuth()
 @ApiTags('Task 考试')
+@Roles(IdentityEnum.ADMIN, IdentityEnum.TEACHER)
 @Controller('task')
 export class TaskController {
   constructor(private readonly taskService: TaskService) {}

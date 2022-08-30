@@ -11,8 +11,11 @@ import {
   ApiBooleanResponse,
   ApiPaginatedResponse,
 } from '../decorators/response.decorator';
+import { Roles } from '../role/role.decorator';
+import { IdentityEnum } from '../enums';
 
 @ApiBearerAuth()
+@Roles(IdentityEnum.ADMIN, IdentityEnum.TEACHER)
 @ApiTags('Question 试题')
 @Controller('question')
 export class QuestionController {

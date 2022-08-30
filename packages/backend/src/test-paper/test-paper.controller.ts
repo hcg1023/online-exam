@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { TestPaperService } from './test-paper.service';
 import { CreateTestPaperDto } from './dto/create-test-paper.dto';
 import { UpdateTestPaperDto } from './dto/update-test-paper.dto';
@@ -13,8 +13,11 @@ import {
   ApiPaginatedResponse,
 } from '../decorators/response.decorator';
 import { PaginatedVO } from '../common/paginated.vo.entity';
+import { Roles } from '../role/role.decorator';
+import { IdentityEnum } from '../enums';
 
 @ApiBearerAuth()
+@Roles(IdentityEnum.ADMIN, IdentityEnum.TEACHER)
 @ApiTags('TestPaper 试卷')
 @Controller('test-paper')
 export class TestPaperController {

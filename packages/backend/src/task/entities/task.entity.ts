@@ -28,6 +28,36 @@ export class Task {
   @JoinTable()
   testPapers: TestPaper[];
 
+  // 开始日期
+  @Column({
+    type: 'date',
+    transformer: {
+      // 写入
+      to(value: number): Date {
+        return new Date(value);
+      },
+      from(value: string): Date {
+        return new Date(value);
+      },
+    },
+  })
+  startDate: Date;
+
+  // 结束日期
+  @Column({
+    type: 'date',
+    transformer: {
+      // 写入
+      to(value: number): Date {
+        return new Date(value);
+      },
+      from(value: Date): Date {
+        return new Date(value);
+      },
+    },
+  })
+  endDate: Date;
+
   @CreateDateColumn()
   createdDate: Date;
 

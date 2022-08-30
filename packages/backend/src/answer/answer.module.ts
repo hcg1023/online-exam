@@ -10,5 +10,6 @@ import { TaskModule } from '../task/task.module';
   imports: [TypeOrmModule.forFeature([Answer, QuestionAnswer]), TaskModule],
   controllers: [AnswerController],
   providers: [AnswerService],
+  exports: [AnswerService],
 })
 export class AnswerModule {}

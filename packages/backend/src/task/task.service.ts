@@ -3,17 +3,17 @@ import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Task } from './entities/task.entity';
-import { Like, Repository } from 'typeorm';
+import { LessThanOrEqual, Like, MoreThanOrEqual, Repository } from 'typeorm';
 import { TestPaperService } from '../test-paper/test-paper.service';
 import { ListTaskDto } from './dto/list-task.dto';
-import { TaskVO } from './entities/task.vo.entity';
+import { TaskBaseVO, TaskVO } from './entities/task.vo.entity';
 import { plainToInstance } from 'class-transformer';
 import { GradeService } from '../grade/grade.service';
 
 @Injectable()
 export class TaskService {
   constructor(
-    @InjectRepository(Task) private tasksRepository: Repository<Task>,
+    @InjectRepository(Task) public tasksRepository: Repository<Task>,
     private testPaperService: TestPaperService,
     private gradesService: GradeService,
   ) {}
@@ -36,6 +36,12 @@ export class TaskService {
       where: {
         title: query.title ? Like(`%${query.title}%`) : null,
         grade: query.grade ? { id: query.grade } : null,
+        startDate: query.startDate
+          ? MoreThanOrEqual(new Date(query.startDate))
+          : null,
+        endDate: query.endDate
+          ? LessThanOrEqual(new Date(query.endDate))
+          : null,
       },
       relations: {
         grade: true,
@@ -46,6 +52,15 @@ export class TaskService {
       },
     });
     return [plainToInstance(TaskVO, list), total];
+  }
+
+  async findBaseTaskWhereId(id: string) {
+    const task = await this.tasksRepository.findOne({
+      where: {
+        id,
+      },
+    });
+    return plainToInstance(TaskBaseVO, task);
   }
 
   async findOne(id: string) {
