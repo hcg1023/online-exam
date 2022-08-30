@@ -4,7 +4,7 @@
  * @Version: 1.0
  * @LastEditors: @yzcheng
  * @Description: 班级 新增编辑
- * @LastEditTime: 2022-08-28 20:58:27
+ * @LastEditTime: 2022-08-29 12:09:25
 -->
 <template>
   <el-dialog
@@ -67,18 +67,31 @@
               </el-form-item>
             </el-col>
             <el-col :span="24">
-              <el-form-item label="选项" style="width:100%" prop="grade">
+              <el-form-item label="选项">
                 <div class="topic_options">
-                  <el-input
-                    v-model="formState.title"
-                    style="width:100px"
-                    placeholder="请输入选项"
-                  />
-                  <el-input
-                    v-model="formState.title"
-                    placeholder="请输入选项内容"
-                  />
+                  <el-space wrap>
+                    <el-input
+                      style="width: 100px"
+                      v-model="formState.title"
+                      placeholder="请输入选项"
+                    />
+                    <el-input
+                      style="width: 400px"
+                      v-model="formState.title"
+                      placeholder="请输入选项内容"
+                    />
+                    <el-button type="danger" circle>
+                      <IconifyIconOffline icon="delete" />
+                    </el-button>
+                  </el-space>
                 </div>
+                <el-button
+                  type="primary"
+                  ghost
+                  style="width: 100%; margin-top: 10px"
+                  :loading="loading"
+                  >增加一行</el-button
+                >
               </el-form-item>
             </el-col>
             <el-col :span="24">
@@ -150,6 +163,7 @@
 </template>
 
 <script setup lang="ts">
+import { IconifyIconOffline } from "/@/components/ReIcon";
 import {
   onMounted,
   ref,
@@ -312,7 +326,7 @@ onMounted(async () => {
 </script>
 
 <style scoped lang="scss">
-.topic_options{
+.topic_options {
   display: flex;
   justify-content: space-around;
 }
