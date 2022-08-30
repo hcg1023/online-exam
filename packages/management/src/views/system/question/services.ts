@@ -37,3 +37,8 @@ export const getQuestionList = (params?: object) => {
 export const deleteQuestion = (id?: string) => {
   return http.request<Result>("post", `/question/remove/${id}`);
 };
+
+// 根据年级查询班级列表
+export const getClassInfo = (params?: object) => {
+  return http.request<Result>("get", "/grade/subjects", { params });
+};
