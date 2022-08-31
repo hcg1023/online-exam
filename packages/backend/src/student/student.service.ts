@@ -10,12 +10,16 @@ import { TaskService } from '../task/task.service';
 import { QueryTaskListDto } from './dto/query-task-list.dto';
 import { getRepositoryPaginationParams } from '../common/paginated.dto';
 import { TestPaperService } from '../test-paper/test-paper.service';
-import { TaskTestPaperVO } from './entities/task-test-paper.vo.entity';
+import { QueryTaskTestPaperVO } from './entities/query-task-test-paper.vo.entity';
 import { CreateAnswerDto } from '../answer/dto/create-answer.dto';
 import { QuestionTypeEnum } from '../enums';
 import { QuestionVO } from '../question/entities/question.vo.entity';
+import { TestPaperAndAnswerVO } from './entities/test-paper-and-answer.vo.entity';
 
-type TaskResolverTestPaperMap = Map<string, { id: string; status: boolean }[]>;
+type TaskResolverTestPaperMap = Map<
+  string,
+  { id: string; status: boolean; totalScore: number }[]
+>;
 
 @Injectable()
 export class StudentService {
@@ -40,12 +44,23 @@ export class StudentService {
         createdUser: true,
         task: true,
         testPaper: true,
+        questionAnswers: true,
       },
     });
     const taskResolverTestPaperMap: TaskResolverTestPaperMap =
       taskStatus.reduce((result, item) => {
         const arr = result.get(item.task.id) ?? [];
-        arr.push({ id: item.testPaper.id, status: item.correctStatus });
+        const totalScore = item.questionAnswers.reduce(
+          (totalScore, questionAnswer) => {
+            return totalScore + (questionAnswer.score ?? 0);
+          },
+          0,
+        );
+        arr.push({
+          id: item.testPaper.id,
+          status: item.correctStatus,
+          totalScore,
+        });
         result.set(item.task.id, arr);
         return result;
       }, new Map());
@@ -61,7 +76,10 @@ export class StudentService {
     tasks: StudentTaskVO[],
     taskResolverTestPaperMap: TaskResolverTestPaperMap,
   );
-  setTaskTestPaperStatus(tasks, taskResolverTestPaperMap) {
+  setTaskTestPaperStatus(
+    tasks: StudentTaskVO | StudentTaskVO[],
+    taskResolverTestPaperMap: TaskResolverTestPaperMap,
+  ) {
     const _tasks = Array.isArray(tasks) ? tasks : [tasks];
     _tasks.forEach((task) => {
       const testPaperIds = taskResolverTestPaperMap.get(task.id) || [];
@@ -73,6 +91,7 @@ export class StudentService {
           testPaper.status = statusItem.status
             ? TaskStatusEnum.DONE
             : TaskStatusEnum.CORRECT;
+          testPaper.doneTotalScore = statusItem.totalScore;
         } else {
           testPaper.status = TaskStatusEnum.UNDONE;
         }
@@ -133,7 +152,7 @@ export class StudentService {
       this.taskService.findBaseTaskWhereId(taskId),
       this.testPaperService.findOne(testPaperId),
     ]);
-    return plainToInstance(TaskTestPaperVO, { ...testPaper, task });
+    return plainToInstance(QueryTaskTestPaperVO, { ...testPaper, task });
   }
 
   async submitTestPaperAnswer(createAnswerDto: CreateAnswerDto) {
@@ -165,70 +184,56 @@ export class StudentService {
     }, new Map<number, QuestionVO>());
     const questionAnswers = questionAnswersInput.map((answerItem) => {
       const question = questionMap.get(answerItem.questionId);
+      const questionAnswerInstance =
+        this.answerService.questionAnswerRepository.create({
+          question: {
+            id: answerItem.questionId,
+          },
+        });
       switch (question.type) {
         case QuestionTypeEnum.SINGLE_CHOICE:
         case QuestionTypeEnum.JUDGE_QUESTION:
-          const singleChoiceOrJudge =
-            this.answerService.questionAnswerRepository.create({
-              question: {
-                id: answerItem.questionId,
-              },
-              options: answerItem.options,
-              correctStatus: true,
-            });
+          questionAnswerInstance.options = answerItem.options;
+          questionAnswerInstance.correctStatus = true;
           // 单选或者判断，回答正确，获得全部分数
-          if (
-            answerItem.options.length === question.correctOptions.length &&
-            answerItem.options[0] === question.correctOptions[0]
-          ) {
-            singleChoiceOrJudge.score = question.score;
+          if (answerItem.options[0] === question.correctOptions[0]) {
+            questionAnswerInstance.score = question.score;
           } else {
-            singleChoiceOrJudge.score = 0;
+            questionAnswerInstance.score = 0;
           }
-          return singleChoiceOrJudge;
+          break;
         case QuestionTypeEnum.MULTIPLE_CHOICE:
-          const multipleChoice =
-            this.answerService.questionAnswerRepository.create({
-              question: {
-                id: answerItem.questionId,
-              },
-              options: answerItem.options,
-            });
+          questionAnswerInstance.options = answerItem.options;
           const isEqual = judgeOptionsIsEqual(
             answerItem.options,
             question.correctOptions,
           );
           // 多选题完全正确的情况，获得全部分数，否则由教师给分
           if (isEqual) {
-            multipleChoice.score = question.score;
-            multipleChoice.correctStatus = true;
+            questionAnswerInstance.score = question.score;
+            questionAnswerInstance.correctStatus = true;
           } else {
-            multipleChoice.correctStatus = false;
+            questionAnswerInstance.correctStatus = false;
           }
-          return multipleChoice;
+          break;
         case QuestionTypeEnum.REPLY_QUESTION:
         case QuestionTypeEnum.SHORT_ANSWER:
-          const replyOrShort =
-            this.answerService.questionAnswerRepository.create({
-              question: {
-                id: answerItem.questionId,
-              },
-              answer: answerItem.answer,
-            });
+          questionAnswerInstance.answer = answerItem.answer;
           if (answerItem.answer === question.answer) {
-            replyOrShort.score = question.score;
-            replyOrShort.correctStatus = true;
+            questionAnswerInstance.score = question.score;
+            questionAnswerInstance.correctStatus = true;
           } else {
-            replyOrShort.correctStatus = false;
+            questionAnswerInstance.correctStatus = false;
           }
-          return replyOrShort;
+          break;
       }
+      return questionAnswerInstance;
     });
     // 如果试题答案都没有待批改，则整条数据直接完成
     const correctStatus = questionAnswers.every(
       (question) => question.correctStatus === true,
     );
-    const { id } = await this.answerService.answersRepository.save({
+    await this.answerService.answersRepository.save({
       testPaper: {
         id: testPaperId,
       },
@@ -244,6 +249,26 @@ export class StudentService {
     });
 
     return true;
+  }
+
+  async getTestPaperAndAnswer(
+    taskId: string,
+    testPaperId: string,
+    userId: number,
+  ) {
+    const [testPaper, answer] = await Promise.all([
+      this.getTestPaperInfo(taskId, testPaperId),
+      this.answerService.findOneFromTaskAndTestPaperAndUser(
+        taskId,
+        testPaperId,
+        userId,
+        true,
+      ),
+    ]);
+    return plainToInstance(TestPaperAndAnswerVO, {
+      testPaper,
+      answer,
+    });
   }
 }
 

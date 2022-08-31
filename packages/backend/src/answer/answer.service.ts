@@ -5,6 +5,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Answer } from './entities/answer.entity';
 import { QuestionAnswer } from './entities/question.answer.entity';
+import { plainToInstance } from 'class-transformer';
+import { AnswerVO } from './entities/answer.vo.entity';
 
 @Injectable()
 export class AnswerService {
@@ -30,6 +32,7 @@ export class AnswerService {
     taskId: string,
     testPaperId: string,
     userId: number,
+    relation = false,
   ) {
     const answer = await this.answersRepository.findOne({
       where: {
@@ -43,8 +46,15 @@ export class AnswerService {
           id: userId,
         },
       },
+      relations: relation
+        ? {
+            questionAnswers: true,
+            createdUser: true,
+            correctTeacher: true,
+          }
+        : null,
     });
-    return answer;
+    return plainToInstance(AnswerVO, answer);
   }
 
   update(id: number, updateAnswerDto: UpdateAnswerDto) {

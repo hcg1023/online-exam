@@ -50,4 +50,17 @@ export class StudentController {
     submitExamAnswerDto.createdUserId = user.id;
     return this.studentService.submitTestPaperAnswer(submitExamAnswerDto);
   }
+
+  @Get('/answer/:taskId/:testPaperId')
+  async getTestPaperAndAnswer(
+    @Param('taskId') taskId: string,
+    @Param('testPaperId') testPaperId: string,
+    @RequestUser() user: UserVO,
+  ) {
+    return this.studentService.getTestPaperAndAnswer(
+      taskId,
+      testPaperId,
+      user.id,
+    );
+  }
 }

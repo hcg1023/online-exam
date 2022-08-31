@@ -17,6 +17,11 @@ export class StudentTestPaperVO extends TestPaperVO {
   get statusName() {
     return TaskStatusFormatterEnum[this.status];
   }
+
+  @ApiProperty({
+    description: '试卷完成时，总得分',
+  })
+  doneTotalScore?: number;
 }
 
 export class StudentTaskVO extends TaskVO {
