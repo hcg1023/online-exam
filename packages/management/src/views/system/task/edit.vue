@@ -4,7 +4,7 @@
  * @Version: 1.0
  * @LastEditors: @yzcheng
  * @Description: 试题 新增编辑
- * @LastEditTime: 2022-09-03 22:10:30
+ * @LastEditTime: 2022-09-03 23:51:26
 -->
 <template>
   <el-dialog
@@ -143,7 +143,7 @@
       @close="handleCancel"
     >
       <div>
-        <paperComp v-if="paperVisible" :dataList="dataList" :onSetSelection="setSelection" />
+        <paperComp v-if="paperVisible" :list="dataList" :onSetSelection="setSelection" />
         <div class="con-bottom">
           <el-button
             type="primary"

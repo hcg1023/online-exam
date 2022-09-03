@@ -4,7 +4,7 @@
  * @Version: 1.0
  * @LastEditors: @yzcheng
  * @Description: 年级 新增编辑
- * @LastEditTime: 2022-08-28 18:04:58
+ * @LastEditTime: 2022-09-03 23:53:22
 -->
 <template>
   <el-dialog
@@ -26,7 +26,7 @@
               <el-form-item label="年级名称" prop="title">
                 <el-input
                   v-model="formState.title"
-                  placeholder="请输入班级名称"
+                  placeholder="请输入年级名称"
                 />
               </el-form-item>
             </el-col>

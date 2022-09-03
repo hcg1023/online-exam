@@ -4,7 +4,7 @@
  * @Version: 1.0
  * @LastEditors: @yzcheng
  * @Description: 班级 新增编辑
- * @LastEditTime: 2022-08-28 18:29:00
+ * @LastEditTime: 2022-09-03 23:55:46
 -->
 <template>
   <el-dialog
@@ -28,7 +28,7 @@
             </el-col>
             <el-col :span="24">
               <el-form-item label="年级名称" prop="grade">
-                <el-select v-model="formState.grade" placeholder="请选择学科">
+                <el-select v-model="formState.grade" placeholder="请选择年级">
                   <el-option
                     v-for="{ id, title } in gradeList"
                     :key="id"

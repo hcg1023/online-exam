@@ -17,7 +17,7 @@ const props = defineProps({
     type: Function,
     default: () => () => {}
   },
-  dataList: {
+  list: {
     type: Array,
     default: []
   }
@@ -70,6 +70,9 @@ const resetForm = (formEl: FormInstance | undefined) => {
 };
 onMounted(() => {
   onSearch();
+  props.list.forEach(i=>{
+    console.log('i :>> ', i);
+  })
 });
 </script>
 
