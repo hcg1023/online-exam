@@ -4,7 +4,7 @@
  * @Version: 1.0
  * @LastEditors: @yzcheng
  * @Description:
- * @LastEditTime: 2022-08-27 19:25:06
+ * @LastEditTime: 2022-09-03 20:31:56
  */
 import { http } from "/@/utils/http";
 type Result = {
@@ -13,17 +13,25 @@ type Result = {
   message?: string;
 };
 
-// 更新班级管理
-export const updateClassList = (data?: object) => {
-  return http.request<Result>("post", `/class-info/update`, { data });
+// 更新试卷管理
+export const updateTestList = (data?: object) => {
+  return http.request<Result>("post", `/task/update`, { data });
 };
 
-// 添加班级管理
-export const addClassList = (data?: object) => {
-  return http.request<Result>("post", `/class-info/create`, { data });
+// 添加试卷管理
+export const addTestList = (data?: object) => {
+  return http.request<Result>("post", `/task/create`, { data });
 };
 
-// 添加班级管理
-export const findClassDetailed = (id?: string) => {
-  return http.request<Result>("get", `/class-info/${id}`);
+// 查找试卷管理
+export const findTestDetailed = (id?: string) => {
+  return http.request<Result>("get", `/task/${id}`);
+};
+// 获取试卷列表
+export const getTestList = (params?: object) => {
+  return http.request<Result>("get", "/task/list", { params });
+};
+// 删除试卷管理
+export const deleteTest = (id?: string) => {
+  return http.request<Result>("post", `/task/remove/${id}`);
 };

@@ -55,7 +55,7 @@ function handleSelectionChange(val) {
 }
 
 async function onSearch() {
-  loading.value = false;
+  loading.value = true;
   let {
     data: { results }
   } = await getQuestionList(form);

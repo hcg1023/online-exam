@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { useColumns } from "./columns";
 import type { responseData } from "/#/index";
-import { getTestList, deleteTest } from "./services";
+import { getTestPaperList } from "./services";
 import { FormInstance } from "element-plus";
 import { handleTree } from "@pureadmin/utils";
-import { reactive, ref, onMounted } from "vue";
+import { reactive, ref, defineProps, onMounted } from "vue";
 import { TableProBar } from "/@/components/ReTable";
 import { useRenderIcon } from "/@/components/ReIcon/src/hooks";
 import { message } from "@pureadmin/components";
@@ -12,7 +12,12 @@ import edit from "./edit.vue";
 defineOptions({
   name: "Dept"
 });
-
+const props = defineProps({
+  onSetSelection: {
+    type: Function,
+    default: () => () => {}
+  }
+});
 const form = reactive({
   name: "",
   pageNo: 1,
@@ -41,24 +46,15 @@ function handle(type: string, row: any) {
       break;
   }
 }
-const handleDelete = async (row: any) => {
-  const { code, message: msg }: responseData = await deleteTest(row.id);
-  if (code === 200) {
-    onSearch();
-    message.success("删除成功");
-  } else {
-    message.error(msg);
-  }
-};
-function handleSelectionChange(val) {
-  console.log("handleSelectionChange", val);
+function handleSelectionChange(val: any[]) {
+  props.onSetSelection(val)
 }
 
 async function onSearch() {
   loading.value = true;
   let {
     data: { results }
-  } = await getTestList(form);
+  } = await getTestPaperList(form);
   dataList.value = handleTree(results as any);
   loading.value = false;
 }
@@ -82,8 +78,8 @@ onMounted(() => {
       :model="form"
       class="bg-white dark:bg-dark w-99/100 pl-8 pt-4"
     >
-      <el-form-item label="考试名称：" prop="user">
-        <el-input v-model="form.name" placeholder="请输入考试名称" clearable />
+      <el-form-item label="试卷名称：" prop="user">
+        <el-input v-model="form.name" placeholder="请输入试卷名称" clearable />
       </el-form-item>
       <!-- <el-form-item label="状态：" prop="status">
         <el-select v-model="form.status" placeholder="请选择状态" clearable>
@@ -111,21 +107,13 @@ onMounted(() => {
     </el-form>
 
     <TableProBar
-      title="考试列表"
+      title="试题列表"
       :loading="loading"
       :tableRef="tableRef?.getTableRef()"
       :dataList="dataList"
       @refresh="onSearch"
     >
-      <template #buttons>
-        <el-button
-          type="primary"
-          @click="handle('add')"
-          :icon="useRenderIcon('add')"
-        >
-          新增考试
-        </el-button>
-      </template>
+      <template #buttons> </template>
       <template v-slot="{ size, checkList }">
         <PureTable
           ref="tableRef"
@@ -144,42 +132,11 @@ onMounted(() => {
           }"
           @selection-change="handleSelectionChange"
         >
-          <template #operation="{ row }">
-            <el-button
-              class="reset-margin"
-              link
-              type="primary"
-              :size="size"
-              :loading="loading"
-              @click="handle('edit', row)"
-              :icon="useRenderIcon('edits')"
-            >
-              修改
-            </el-button>
-            <el-popconfirm @confirm="handleDelete(row)" title="是否确认删除?">
-              <template #reference>
-                <el-button
-                  class="reset-margin"
-                  link
-                  :loading="loading"
-                  type="primary"
-                  :size="size"
-                  :icon="useRenderIcon('delete')"
-                >
-                  删除
-                </el-button>
-              </template>
-            </el-popconfirm>
+          <template #difficulty="{ row }">
+            <el-rate disabled v-model="row.difficulty" />
           </template>
         </PureTable>
       </template>
     </TableProBar>
-    <edit
-      v-if="visible"
-      v-model:visible="visible"
-      :type="deptType"
-      :id="deptId"
-      :onUpdate="onSearch"
-    />
   </div>
 </template>
