@@ -4,7 +4,7 @@
  * @Version: 1.0
  * @LastEditors: @yzcheng
  * @Description: 试题 新增编辑
- * @LastEditTime: 2022-09-03 20:49:18
+ * @LastEditTime: 2022-09-03 20:57:25
 -->
 <template>
   <el-dialog
@@ -78,7 +78,7 @@
                     <IconifyIconOffline icon="delete" />
                   </el-button>
                 </el-space>
-                <div class="question-box" v-if="i.questionList.length">
+                <div class="question-box" v-if="i?.questionList?.length">
                   <div
                     v-for="(item, index) in i.questionList"
                     class="question-view"
