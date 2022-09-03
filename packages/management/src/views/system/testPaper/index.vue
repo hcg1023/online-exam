@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useColumns } from "./columns";
 import type { responseData } from "/#/index";
-import { getDeptList, deleteDept } from "/@/api/system";
+import { getTestPaperList, deleteTestPaper } from "./services";
 import { FormInstance } from "element-plus";
 import { handleTree } from "@pureadmin/utils";
 import { reactive, ref, onMounted } from "vue";
@@ -42,7 +42,7 @@ function handle(type: string, row: any) {
   }
 }
 const handleDelete = async (row: any) => {
-  const { code, message: msg }: responseData = await deleteDept(row.id);
+  const { code, message: msg }: responseData = await deleteTestPaper(row.id);
   if (code === 200) {
     onSearch();
     message.success("删除成功");
@@ -58,7 +58,7 @@ async function onSearch() {
   loading.value = true;
   let {
     data: { results }
-  } = await getDeptList(form);
+  } = await getTestPaperList(form);
   dataList.value = handleTree(results as any);
   loading.value = false;
 }
@@ -82,8 +82,8 @@ onMounted(() => {
       :model="form"
       class="bg-white dark:bg-dark w-99/100 pl-8 pt-4"
     >
-      <el-form-item label="班级名称：" prop="user">
-        <el-input v-model="form.name" placeholder="请输入班级名称" clearable />
+      <el-form-item label="试卷名称：" prop="user">
+        <el-input v-model="form.name" placeholder="请输入试卷名称" clearable />
       </el-form-item>
       <!-- <el-form-item label="状态：" prop="status">
         <el-select v-model="form.status" placeholder="请选择状态" clearable>
@@ -111,7 +111,7 @@ onMounted(() => {
     </el-form>
 
     <TableProBar
-      title="班级列表"
+      title="试卷列表"
       :loading="loading"
       :tableRef="tableRef?.getTableRef()"
       :dataList="dataList"
@@ -123,7 +123,7 @@ onMounted(() => {
           @click="handle('add')"
           :icon="useRenderIcon('add')"
         >
-          新增班级
+          新增试卷
         </el-button>
       </template>
       <template v-slot="{ size, checkList }">

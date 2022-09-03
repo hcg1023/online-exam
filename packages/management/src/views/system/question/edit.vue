@@ -4,7 +4,7 @@
  * @Version: 1.0
  * @LastEditors: @yzcheng
  * @Description: 试题 新增编辑
- * @LastEditTime: 2022-08-30 19:01:32
+ * @LastEditTime: 2022-09-03 16:44:22
 -->
 <template>
   <el-dialog
@@ -27,6 +27,7 @@
                 <el-select
                   v-model="formState.type"
                   placeholder="请选择创编类型"
+                  @change="setFormOptions"
                 >
                   <el-option
                     v-for="{ key, name } in topicType"
@@ -68,13 +69,61 @@
             <el-col :span="24">
               <el-form-item label="题干" prop="title">
                 <el-input
+                  v-if="!['REPLY_QUESTION'].includes(getType)"
+                  style="width: 85%; margin-right: 20px"
                   v-model="formState.title"
                   placeholder="请输入题干名称"
                 />
+                <el-input
+                  v-else
+                  style="width: 85%; margin-right: 20px"
+                  v-model="formState.title"
+                  clearable
+                  @input="setFormOptionsTitle"
+                  placeholder="请输入题干名称"
+                />
+                <el-button
+                  v-if="['REPLY_QUESTION'].includes(getType)"
+                  type="primary"
+                  circle
+                >
+                  <IconifyIconOffline
+                    icon="add"
+                    @click="addFormTitleOption()"
+                  />
+                </el-button>
               </el-form-item>
             </el-col>
-            <el-col :span="24" v-if="!['SHORT_ANSWER','REPLY_QUESTION'].includes(getType)">
-              <el-form-item label="选项" name="options">
+            <el-col :span="24" v-if="!['SHORT_ANSWER'].includes(getType)">
+              <el-form-item
+                :label="'标答'"
+                prop="options"
+                v-if="['REPLY_QUESTION'].includes(getType)"
+              >
+                <el-space wrap>
+                  <div
+                    class="topic_options"
+                    v-for="(item, index) in formState.options"
+                    :key="`${index}-`"
+                  >
+                    <el-space wrap>
+                      <el-input
+                        disabled
+                        style="width: 100px"
+                        v-model="item.title"
+                        placeholder="请输入选项"
+                      />
+                      <el-input
+                        style="width: 400px"
+                        v-model="item.value"
+                        placeholder="请输入选项内容"
+                      />
+                      <!-- <el-input-number :min="1" :max="100" /> -->
+                    </el-space>
+                  </div>
+                </el-space>
+              </el-form-item>
+              <el-form-item v-else :label="'选项'" prop="options">
                 <el-space wrap>
                   <div
                     class="topic_options"
@@ -92,11 +141,12 @@
                         v-model="item.value"
                         placeholder="请输入选项内容"
                       />
-                      <el-button type="danger" circle>
-                        <IconifyIconOffline
-                          icon="delete"
-                          @click="deleteOptions(index)"
-                        />
+                      <el-button
+                        type="danger"
+                        @click="deleteOptions(index)"
+                        circle
+                      >
+                        <IconifyIconOffline icon="delete" />
                       </el-button>
                     </el-space>
                   </div>
@@ -111,8 +161,15 @@
                 >
               </el-form-item>
             </el-col>
-            <el-col :span="24">
-              <el-form-item label="标答" prop="correctOptions">
+            <el-col :span="24" v-if="!['REPLY_QUESTION'].includes(getType)">
+              <el-form-item
+                label="标答"
+                :prop="
+                  ['SHORT_ANSWER'].includes(getType)
+                    ? 'answer'
+                    : 'correctOptions'
+                "
+              >
                 <el-checkbox-group
                   v-if="['MULTIPLE_CHOICE'].includes(getType)"
                   v-model="formState.correctOptions"
@@ -138,7 +195,7 @@
                 </el-radio-group>
                 <el-input
                   v-if="['SHORT_ANSWER'].includes(getType)"
-                  v-model="formState.correctOptions"
+                  v-model="formState.answer"
                   placeholder="请输入标答名称"
                 />
               </el-form-item>
@@ -147,6 +204,7 @@
               <el-form-item label="解析" prop="analyze">
                 <el-input
                   type="textarea"
+                  autosize
                   v-model="formState.analyze"
                   placeholder="请写解析"
                 />
@@ -201,6 +259,7 @@ import { IconifyIconOffline } from "/@/components/ReIcon";
 import {
   onMounted,
   ref,
+  watch,
   reactive,
   toRaw,
   computed,
@@ -217,6 +276,7 @@ import {
 import { message } from "@pureadmin/components";
 import { getGradeList } from "/@/api/system";
 import type { FormInstance, FormRules } from "element-plus";
+import { words } from "lodash-unified";
 const ruleFormRef = ref<FormInstance>();
 const radioDefaule = ref(null);
 const topicType = [
@@ -279,12 +339,28 @@ const getType = computed(() => {
 const handleAddUpdCancel = () => {
   ctx.$emit("update:visible", false);
 };
+// 阻止用户手动删除
+const setFormOptionsTitle = (val: any) => {
+  console.log("val :>> ", val);
+};
+//给form重置
+const setFormOptions = (val: any) => {
+  if (["SHORT_ANSWER", "REPLY_QUESTION"].includes(val)) {
+    formState.options = [];
+    return;
+  }
+  formState.options = [{ ...defaultData }];
+};
+//给填空题添加一个选项
+const addFormTitleOption = () => {
+  formState.title += `(${formState.options.length + 1})`;
+};
 //删除一条选项
 const deleteOptions = (index: number) => {
   formState.options.splice(index, 1);
 };
 //添加一条选项
-const addOptions = (index: number) => {
+const addOptions = () => {
   if (
     ["JUDGE_QUESTION"].includes(getType.value) &&
     formState.options.length >= 2
@@ -300,7 +376,7 @@ const formState: any = reactive({
   title: "",
   type: "SINGLE_CHOICE",
   score: 0,
-  difficulty: 0,
+  difficulty: 1,
   grade: "",
   subject: "",
   options: [
@@ -309,13 +385,35 @@ const formState: any = reactive({
       value: ""
     }
   ],
-  correctOptions: "",
+  correctOptions: [],
   answer: "",
   analyze: ""
 });
+watch(
+  () => formState.title,
+  val => {
+    if (formState.type === "REPLY_QUESTION") {
+      const data = words(val, /(?<=\()(.+?)(?=\))/g);
+      formState.options = data.reduce((d: any, i, index) => {
+        d.push({
+          title: i,
+          value: formState.correctOptions[index] || ""
+        });
+        return d;
+      }, []);
+    }
+  }
+);
 // 校验
 const rules = reactive<FormRules>({
   analyze: [
+    {
+      required: true,
+      trigger: "change",
+      message: "解析是必传项"
+    }
+  ],
+  answer: [
     {
       required: true,
       trigger: "change",
@@ -412,9 +510,20 @@ const updateRegulatory = async (data: any) => {
 };
 // 提交
 const onSubmit = async (formEl: FormInstance | undefined) => {
+  if (
+    !["SHORT_ANSWER", "REPLY_QUESTION"].includes(getType.value) &&
+    formState.options.length < 2
+  ) {
+    message.error("选项必须大于两个选项");
+    return;
+  }
   if (!formEl) return;
   loading.value = true;
   await formEl.validate((valid, fields) => {
+    if (["REPLY_QUESTION"].includes(getType.value)) {
+      formState.correctOptions = formState.options.map((i: any) => i.value);
+      formState.options = [];
+    }
     if (valid) {
       const data = toRaw(formState);
       if (props.type !== "add") {
@@ -445,14 +554,17 @@ onMounted(async () => {
     const res = await findQuestionDetailed(id);
     if (res.code === 200) {
       const { code, data }: responseData = await getClassInfo({
-        id: formState["grade"]
+        id: res.data["grade"].id
       });
       if (code === 200) {
         subjectList.value = data;
       }
+      Object.entries(formState).forEach(([key]) => {
+        formState[key] = res.data[key];
+      });
       formState["id"] = res.data["id"];
-      formState["name"] = res.data["name"];
       formState["grade"] = res.data["grade"]?.id;
+      formState["subject"] = res.data["subject"]?.id;
     }
   }
 });
