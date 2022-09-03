@@ -117,49 +117,61 @@ function addPathMatch() {
 }
 
 // 初始化路由
-function initRouter(data: object) {
+function initRouter(identity?: number) {
   return new Promise(resolve => {
-    getAsyncRoutes(data).then(({ data: { info } }) => {
-      if (info.length === 0) {
-        usePermissionStoreHook().changeSetting(info);
-      } else {
-        useUserStoreHook()
-          .getUserInfo()
-          .then(({ code, data }: responseData) => {
-            if (code === 200) {
-              useUserStoreHook().SET_USERINFO(data);
-              storageSession.setItem("info", {
-                username: data.name,
-                accessToken: useUserStoreHook().token
-              });
-            }
-          });
-        formatFlatteningRoutes(addAsyncRoutes(info)).map(
-          (v: RouteRecordRaw) => {
-            // 防止重复添加路由
-            if (
-              router.options.routes[0].children.findIndex(
-                value => value.path === v.path
-              ) !== -1
-            ) {
-              return;
-            } else {
-              // 切记将路由push到routes后还需要使用addRoute，这样路由才能正常跳转
-              router.options.routes[0].children.push(v);
-              // 最终路由进行升序
-              ascending(router.options.routes[0].children);
-              if (!router.hasRoute(v?.name)) router.addRoute(v);
-              const flattenRouters: any = router
-                .getRoutes()
-                .find(n => n.path === "/");
-              router.addRoute(flattenRouters);
-            }
-            resolve(router);
+    let promise = Promise.resolve();
+    if (!useUserStoreHook().userInfo) {
+      promise = useUserStoreHook()
+        .getUserInfo()
+        .then(({ code, data }: responseData) => {
+          if (code === 200) {
+            useUserStoreHook().SET_USERINFO(data);
+            storageSession.setItem("info", {
+              name: data.username,
+              identity: data.identity,
+              accessToken: useUserStoreHook().token
+            });
           }
-        );
-        usePermissionStoreHook().changeSetting(info);
-      }
-      addPathMatch();
+        });
+    }
+    promise.then(() => {
+      return getAsyncRoutes(
+        identity ?? (useUserStoreHook().userInfo as any).identity
+      ).then(({ data: { info } }) => {
+        if (info.length === 0) {
+          usePermissionStoreHook()
+            .changeSetting(info)
+            .then(() => {
+              resolve(router);
+            });
+        } else {
+          formatFlatteningRoutes(addAsyncRoutes(info)).map(
+            (v: RouteRecordRaw) => {
+              // 防止重复添加路由
+              if (
+                router.options.routes[0].children.findIndex(
+                  value => value.path === v.path
+                ) !== -1
+              ) {
+                return;
+              } else {
+                // 切记将路由push到routes后还需要使用addRoute，这样路由才能正常跳转
+                router.options.routes[0].children.push(v);
+                // 最终路由进行升序
+                ascending(router.options.routes[0].children);
+                if (!router.hasRoute(v?.name)) router.addRoute(v);
+                const flattenRouters: any = router
+                  .getRoutes()
+                  .find(n => n.path === "/");
+                router.addRoute(flattenRouters);
+              }
+            }
+          );
+          resolve(router);
+          usePermissionStoreHook().changeSetting(info);
+        }
+        addPathMatch();
+      });
     });
   });
 }

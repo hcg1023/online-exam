@@ -11,5 +11,6 @@ import { AnswerModule } from '../answer/answer.module';
   imports: [TestPaperModule, GradeModule, UserModule, TaskModule, AnswerModule],
   providers: [StudentService],
   controllers: [StudentController],
+  exports: [StudentService],
 })
 export class StudentModule {}

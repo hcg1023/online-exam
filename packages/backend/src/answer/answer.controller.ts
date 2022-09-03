@@ -6,11 +6,16 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { AnswerService } from './answer.service';
 import { CreateAnswerDto } from './dto/create-answer.dto';
 import { UpdateAnswerDto } from './dto/update-answer.dto';
 import { ApiBearerAuth, ApiExcludeController, ApiTags } from '@nestjs/swagger';
+import { GetWaitingForCorrectionTestPaperListDto } from './dto/get-waiting-for-correction-test-paper-list.dto';
+import { JudgeAnswerDto } from './dto/judge-answer.dto';
+import { RequestUser } from '../auth/user.decorator';
+import { UserVO } from '../user/entities/user.vo.entity';
 
 @ApiBearerAuth()
 @ApiTags('Answer')
@@ -19,28 +24,39 @@ import { ApiBearerAuth, ApiExcludeController, ApiTags } from '@nestjs/swagger';
 export class AnswerController {
   constructor(private readonly answerService: AnswerService) {}
 
-  @Post()
-  create(@Body() createAnswerDto: CreateAnswerDto) {
-    return this.answerService.create(createAnswerDto);
+  @Get('/answer/judgeList')
+  findWaitingForCorrectionTestPaperList(
+    @Query() query: GetWaitingForCorrectionTestPaperListDto,
+  ) {
+    return this.answerService.findWaitingForCorrectionTestPaperList(query);
   }
 
-  @Get()
-  findAll() {
-    return this.answerService.findAll();
+  @Get('/answer/completeList')
+  findCorrectedTestPaperList(
+    @Query() query: GetWaitingForCorrectionTestPaperListDto,
+  ) {
+    return this.answerService.findCorrectedTestPaperList(query);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.answerService.findOne(+id);
+  @Get('/:taskId/testPaperId/:userId')
+  getTestPaperAndAnswer(
+    @Param('taskId') taskId: string,
+    @Param('testPaperId') testPaperId: string,
+    @Param('userId') userId: number,
+  ) {
+    return this.answerService.getTestPaperAndAnswer(
+      taskId,
+      testPaperId,
+      userId,
+    );
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAnswerDto: UpdateAnswerDto) {
-    return this.answerService.update(+id, updateAnswerDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.answerService.remove(+id);
+  @Post('/judge')
+  handleJudgeAnswer(
+    @Body() judgeAnswerDto: JudgeAnswerDto,
+    @RequestUser() user: UserVO,
+  ) {
+    judgeAnswerDto.createdUser = user.id;
+    return this.answerService.handleJudgeAnswer(judgeAnswerDto);
   }
 }

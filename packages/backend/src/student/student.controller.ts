@@ -8,6 +8,14 @@ import { QueryTaskListDto } from './dto/query-task-list.dto';
 import { PaginatedVO } from '../common/paginated.vo.entity';
 import { CreateAnswerDto } from '../answer/dto/create-answer.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBaseResponse,
+  ApiBooleanResponse,
+  ApiPaginatedResponse,
+} from '../decorators/response.decorator';
+import { StudentTaskVO } from './entities/student-task.vo.entity';
+import { QueryTaskTestPaperVO } from './entities/query-task-test-paper.vo.entity';
+import { TestPaperAndAnswerVO } from './entities/test-paper-and-answer.vo.entity';
 
 @ApiBearerAuth()
 @ApiTags('Exam 考试学生端')
@@ -16,6 +24,7 @@ export class StudentController {
   constructor(private studentService: StudentService) {}
 
   @Roles(IdentityEnum.STUDENT)
+  @ApiPaginatedResponse(StudentTaskVO)
   @Get('/tasks')
   async getStudentTaskList(
     @Query() query: QueryTaskListDto,
@@ -34,6 +43,7 @@ export class StudentController {
   }
 
   @Get('/:taskId/:testPaperId')
+  @ApiBaseResponse(QueryTaskTestPaperVO)
   async getTestPaperInfo(
     @Param('taskId') taskId: string,
     @Param('testPaperId') testPaperId: string,
@@ -42,6 +52,7 @@ export class StudentController {
   }
 
   @Post('/submit')
+  @ApiBooleanResponse()
   async submitExamAnswer(
     @Body() submitExamAnswerDto: CreateAnswerDto,
     @RequestUser() user: UserVO,
@@ -52,6 +63,7 @@ export class StudentController {
   }
 
   @Get('/answer/:taskId/:testPaperId')
+  @ApiBaseResponse(TestPaperAndAnswerVO)
   async getTestPaperAndAnswer(
     @Param('taskId') taskId: string,
     @Param('testPaperId') testPaperId: string,

@@ -41,5 +41,6 @@ import { StudentModule } from './student/student.module';
   ],
   controllers: [AppController],
   providers: [AppService],
+  exports: [StudentModule],
 })
 export class AppModule {}

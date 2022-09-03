@@ -26,7 +26,7 @@ export class UserService {
     private gradeService: GradeService,
     private classInfoService: ClassInfoService,
     @InjectRepository(User)
-    private usersRepository: Repository<User>,
+    public usersRepository: Repository<User>,
     @InjectRepository(Password)
     private passwordsRepository: Repository<Password>,
   ) {}

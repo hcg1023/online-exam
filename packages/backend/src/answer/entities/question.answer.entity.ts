@@ -9,7 +9,6 @@ import {
 import { Answer } from './answer.entity';
 import { User } from '../../user/entities/user.entity';
 import { Question } from '../../question/entities/question.entity';
-import { QuestionOption } from '../../question/entities/question-option.entity';
 
 @Entity()
 export class QuestionAnswer {

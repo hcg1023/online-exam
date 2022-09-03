@@ -28,37 +28,11 @@ import {
   storageSession
 } from "@pureadmin/utils";
 
-import pptRouter from "./modules/ppt";
 import homeRouter from "./modules/home";
-import ableRouter from "./modules/able";
-import listRouter from "./modules/list";
-import aboutRouter from "./modules/about";
-import errorRouter from "./modules/error";
-import guideRouter from "./modules/guide";
-import resultRouter from "./modules/result";
-import editorRouter from "./modules/editor";
-import nestedRouter from "./modules/nested";
-import flowChartRouter from "./modules/flowchart";
 import remainingRouter from "./modules/remaining";
-import componentsRouter from "./modules/components";
-import formDesignRouter from "./modules/formdesign";
 
 // 原始静态路由（未做任何处理）
-const routes = [
-  // pptRouter,
-  homeRouter,
-  // ableRouter,
-  // listRouter,
-  // aboutRouter,
-  // errorRouter,
-  // guideRouter,
-  // resultRouter,
-  // nestedRouter,
-  // editorRouter,
-  // flowChartRouter,
-  // componentsRouter,
-  // formDesignRouter
-];
+const routes = [homeRouter];
 
 // 导出处理后的静态路由（三级及以上的路由全部拍成二级）
 export const constantRoutes: Array<RouteRecordRaw> = formatTwoStageRoutes(
@@ -71,15 +45,17 @@ export const constantMenus: Array<RouteComponent> = ascending(routes).concat(
 );
 
 // 不参与菜单的路由
-export const remainingPaths = Object.keys(remainingRouter).map(v => {
-  return remainingRouter[v].path;
-});
+export const remainingPaths = Object.keys(remainingRouter)
+  .map(v => {
+    return remainingRouter[v].path;
+  })
+  .concat("/student/exam-write");
 
 // 创建路由实例
 export const router: Router = createRouter({
   history: getHistoryMode(),
-  routes: constantRoutes.concat(...(remainingRouter as any)),
   strict: true,
+  routes: constantRoutes.concat(...(remainingRouter as any)),
   scrollBehavior(to, from, savedPosition) {
     return new Promise(resolve => {
       if (savedPosition) {
@@ -121,7 +97,7 @@ router.beforeEach((to: toRouteType, _from, next) => {
       handleAliveRoute(newMatched);
     }
   }
-  const name = storageSession.getItem<StorageConfigs>("info");
+  const sessionInfo = storageSession.getItem<StorageConfigs>("info");
   NProgress.start();
   const externalLink = isUrl(to?.name as string);
   if (!externalLink)
@@ -132,7 +108,7 @@ router.beforeEach((to: toRouteType, _from, next) => {
         document.title = `${transformI18n(item.meta.title)} | ${Title}`;
       else document.title = transformI18n(item.meta.title);
     });
-  if (name) {
+  if (sessionInfo) {
     if (_from?.name) {
       // name为超链接
       if (externalLink) {
@@ -143,8 +119,8 @@ router.beforeEach((to: toRouteType, _from, next) => {
       }
     } else {
       // 刷新
-      if (usePermissionStoreHook().wholeMenus.length === 0)
-        initRouter(name.username).then((router: Router) => {
+      if (usePermissionStoreHook().wholeMenus.length === 0) {
+        initRouter().then((router: Router) => {
           if (!useMultiTagsStoreHook().getMultiTagsCache) {
             const { path } = to;
             const index = findIndex(remainingRouter, v => {
@@ -166,6 +142,7 @@ router.beforeEach((to: toRouteType, _from, next) => {
           }
           router.push(to.fullPath);
         });
+      }
       next();
     }
   } else {
@@ -184,5 +161,3 @@ router.beforeEach((to: toRouteType, _from, next) => {
 router.afterEach(() => {
   NProgress.done();
 });
-
-export default router;

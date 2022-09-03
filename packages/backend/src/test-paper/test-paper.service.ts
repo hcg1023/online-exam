@@ -9,6 +9,8 @@ import { plainToInstance } from 'class-transformer';
 import { TestPaperVO } from './entities/test-paper.vo.entity';
 import { ListTestPaperDto } from './dto/list-test-paper.dto';
 import { getRepositoryPaginationParams } from '../common/paginated.dto';
+import { GradeService } from '../grade/grade.service';
+import { SubjectService } from '../subject/subject.service';
 
 @Injectable()
 export class TestPaperService {
@@ -17,10 +19,12 @@ export class TestPaperService {
     public testPapersRepository: Repository<TestPaper>,
     @InjectRepository(QuestionGroup)
     private questionGroupRepository: Repository<QuestionGroup>,
+    private gradeService: GradeService,
+    private subjectService: SubjectService,
   ) {}
 
   async create(createTestPaperDto: CreateTestPaperDto) {
-    const { questionGroups, subject, createdUser, ...createTestPaper } =
+    const { questionGroups, grade, subject, createdUser, ...createTestPaper } =
       createTestPaperDto;
     const newQuestionGroups = questionGroups.map((item) =>
       this.questionGroupRepository.create({
@@ -34,6 +38,9 @@ export class TestPaperService {
     const testPaperCreated = await this.testPapersRepository.create({
       ...createTestPaper,
       questionGroups: questionGroupsCreated,
+      grade: {
+        id: grade,
+      },
       subject: {
         id: subject,
       },
@@ -73,6 +80,7 @@ export class TestPaperService {
         id,
       },
       relations: {
+        grade: true,
         subject: true,
         questionGroups: {
           questions: true,
@@ -84,13 +92,15 @@ export class TestPaperService {
   }
 
   async update(updateTestPaperDto: UpdateTestPaperDto) {
-    const { questionGroups, id, subject, ...updateTestPaper } =
+    const { questionGroups, id, grade, subject, ...updateTestPaper } =
       updateTestPaperDto;
     const testPaper = await this.testPapersRepository.findOne({
       where: {
         id,
       },
       relations: {
+        subject: true,
+        grade: true,
         questionGroups: true,
       },
     });
@@ -103,9 +113,23 @@ export class TestPaperService {
     const questionGroupsCreated = await this.questionGroupRepository.save(
       newQuestionGroups,
     );
+    if (grade && testPaper.grade.id != grade) {
+      testPaper.grade = this.gradeService.gradesRepository.create({
+        id: grade,
+      });
+    }
+    if (subject && testPaper.subject.id != subject) {
+      testPaper.subject = this.subjectService.subjectsRepository.create({
+        id: subject,
+      });
+    }
+
     testPaper.questionGroups = questionGroupsCreated;
-    this.testPapersRepository.merge(testPaper, updateTestPaper);
-    await this.questionGroupRepository.save(testPaper);
+    const newTestPaper = this.testPapersRepository.merge(
+      testPaper,
+      updateTestPaper,
+    );
+    await this.testPapersRepository.save(newTestPaper);
     return this.findOne(id);
   }
 

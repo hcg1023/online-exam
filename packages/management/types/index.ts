@@ -27,6 +27,7 @@ export interface StorageConfigs {
     };
   };
   username?: string;
+  identity: string;
 }
 export interface responseData {
   code: number;

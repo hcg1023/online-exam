@@ -1,5 +1,6 @@
 import Axios from "axios";
+import { IdentityEnum } from "/@/enums";
 
-export const getAsyncRoutes = (params?: object) => {
-  return Axios.get(`/getAsyncRoutes?name=${params}`);
+export const getAsyncRoutes = (identity: IdentityEnum) => {
+  return Axios.get(`/getAsyncRoutes?identity=${identity}`);
 };

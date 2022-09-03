@@ -1,4 +1,5 @@
 import { QuestionVO } from '../../question/entities/question.vo.entity';
+import { Type } from 'class-transformer';
 
 export class QuestionGroupVO {
   id: string;
@@ -7,5 +8,6 @@ export class QuestionGroupVO {
 
   title: string;
 
+  @Type(() => QuestionVO)
   questions: QuestionVO[];
 }
