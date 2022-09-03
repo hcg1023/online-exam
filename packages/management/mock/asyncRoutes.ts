@@ -132,6 +132,15 @@ const studentRouter = {
       }
     },
     {
+      path: "/student/exam-read",
+      name: "ExamRead",
+      meta: {
+        showLink: false,
+        icon: "expand",
+        title: "查看考试"
+      }
+    },
+    {
       path: "/student/exam-list",
       name: "ExamList",
       meta: {

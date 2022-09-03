@@ -128,7 +128,9 @@ export class AnswerService {
       },
       relations: relation
         ? {
-            questionAnswers: true,
+            questionAnswers: {
+              question: true,
+            },
             createdUser: true,
             correctTeacher: true,
           }

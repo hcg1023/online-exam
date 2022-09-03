@@ -22,17 +22,23 @@ export class QuestionAnswer {
   options: string[];
 
   // 填空题和简答题的答案
-  @Column()
+  @Column({
+    default: '',
+  })
   answer: string;
 
   // 批改状态
   // 如果没有填空或者简答题，则一定是true，已批改
   // 有填空题或者简答题，则是false，等待教师批改完成改为true
-  @Column()
+  @Column({
+    default: false,
+  })
   correctStatus: boolean;
 
   // 得分，如果是选择题和判断题，后端处理，如果是填空和简答，需要教师批改
-  @Column()
+  @Column({
+    default: 0,
+  })
   score: number;
 
   // 多个题目答案对应同一个题目

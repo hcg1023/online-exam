@@ -1,6 +1,7 @@
 import { UserVO } from '../../user/entities/user.vo.entity';
 import { ApiProperty } from '@nestjs/swagger';
-import { Expose } from 'class-transformer';
+import { Expose, Type } from 'class-transformer';
+import { QuestionVO } from '../../question/entities/question.vo.entity';
 
 export class QuestionAnswerVO {
   id: string;
@@ -12,6 +13,17 @@ export class QuestionAnswerVO {
   correctStatus: boolean;
 
   score: number;
+
+  @Type(() => QuestionVO)
+  question: QuestionVO;
+
+  @ApiProperty({
+    type: 'number',
+  })
+  @Expose()
+  get questionId() {
+    return this.question.id;
+  }
 }
 
 export class AnswerVO {
@@ -21,10 +33,13 @@ export class AnswerVO {
 
   correctStatus: boolean;
 
+  @Type(() => QuestionAnswerVO)
   questionAnswers: QuestionAnswerVO[];
 
+  @Type(() => UserVO)
   createdUser: UserVO;
 
+  @Type(() => UserVO)
   correctTeacher: UserVO;
 
   @ApiProperty({
@@ -32,7 +47,7 @@ export class AnswerVO {
   })
   @Expose()
   get questionTotal() {
-    return this.questionAnswers.length;
+    return this.questionAnswers?.length ?? 0;
   }
   set questionTotal(num) {
     // fix
@@ -43,7 +58,9 @@ export class AnswerVO {
   })
   @Expose()
   get correctQuestionTotal() {
-    return this.questionAnswers.filter((answer) => answer.correctStatus).length;
+    return (
+      this.questionAnswers?.filter((answer) => answer.correctStatus).length ?? 0
+    );
   }
   set correctQuestionTotal(num) {
     // fix
@@ -54,7 +71,7 @@ export class AnswerVO {
   })
   @Expose()
   get score() {
-    return this.questionAnswers.reduce((result, answer) => {
+    return this.questionAnswers?.reduce((result, answer) => {
       if (answer.correctStatus) {
         result += answer.score;
       }

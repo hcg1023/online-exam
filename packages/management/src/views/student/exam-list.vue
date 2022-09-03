@@ -29,8 +29,19 @@ async function onSearch() {
 onSearch();
 
 function goToExam(taskId: string, testPaperId: string) {
-  router.push({
+  const { href } = router.resolve({
     name: "ExamWrite",
+    query: {
+      taskId,
+      testPaperId
+    }
+  });
+  window.open(href);
+}
+
+function goToReadExam(taskId: string, testPaperId: string) {
+  router.push({
+    name: "ExamRead",
     query: {
       taskId,
       testPaperId
@@ -85,7 +96,11 @@ function goToExam(taskId: string, testPaperId: string) {
                   <el-button
                     type="primary"
                     link
-                    v-if="testPaper.status === TaskStatusEnum.DONE"
+                    v-if="
+                      testPaper.status === TaskStatusEnum.DONE ||
+                      testPaper.status === TaskStatusEnum.CORRECT
+                    "
+                    @click="goToReadExam(row.id, testPaper.id)"
                     >查看试卷</el-button
                   >
                   <el-button
@@ -111,6 +126,9 @@ function goToExam(taskId: string, testPaperId: string) {
   justify-content: space-between;
   align-items: center;
   padding: 0 20px;
+  & + & {
+    margin-top: 10px;
+  }
 }
 .exam-status {
   display: inline-block;
@@ -128,6 +146,11 @@ function goToExam(taskId: string, testPaperId: string) {
     background-color: #fef0f0;
     border-color: #fde2e2;
     color: #f56c6c;
+  }
+  &-correct {
+    background-color: #fdf6ec;
+    border-color: #faecd8;
+    color: #e6a23c;
   }
 }
 </style>

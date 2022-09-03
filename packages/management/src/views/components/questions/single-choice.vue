@@ -5,6 +5,7 @@ const props = defineProps<{
   question: BaseQuestion;
   value: string[];
   onUpdateValue: (value: string[]) => void;
+  readonly: boolean;
 }>();
 
 const onChange = (value: string) => {
@@ -18,6 +19,7 @@ const onChange = (value: string) => {
     <el-radio-group
       class="question-options"
       :model-value="value[0]"
+      :disabled="readonly"
       @change="onChange"
     >
       <el-radio

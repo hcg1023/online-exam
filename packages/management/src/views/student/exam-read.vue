@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref } from "vue";
+import { onMounted, onUnmounted, ref, computed } from "vue";
 import { useRoute } from "vue-router";
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
 import "dayjs/locale/zh-cn";
-import { getTaskTestPaperInfo, submitTestPaper } from "/@/api/student";
+import { getTestPaperReadInfo } from "/@/api/student";
 import {
   JudgeQuestion,
   MultipleChoice,
@@ -13,7 +13,6 @@ import {
   SingleChoice
 } from "../components/questions";
 import { QuestionTypeEnum } from "/@/enums";
-import { ElMessageBox } from "element-plus";
 
 const components = {
   [QuestionTypeEnum.JUDGE_QUESTION]: JudgeQuestion,
@@ -32,45 +31,17 @@ const testPaperInfo = ref();
 const endTime = ref();
 const timer = ref();
 const durationTimeStr = ref("");
-const questionAnswers = ref([]);
-
-function initQuestionAnswers(questionGroups) {
-  const answers = [];
-  questionGroups.forEach(questionGroup => {
-    questionGroup.questions.forEach(question => {
-      answers.push({
-        questionId: question.id,
-        options: [],
-        answer: ""
-      });
-    });
-  });
-  questionAnswers.value = answers;
-}
+const answerInfo = ref();
+const questionAnswers = computed(() => answerInfo.value?.questionAnswers);
 
 function getQuestionValue(questionId: number, questionType: QuestionTypeEnum) {
   const item = questionAnswers.value.find(
     item => item.questionId === questionId
   );
   if (questionType === QuestionTypeEnum.SHORT_ANSWER) {
-    return item.answer;
+    return item?.answer ?? "";
   }
-  return item.options;
-}
-
-function setQuestionValue(
-  questionId: number,
-  questionType: QuestionTypeEnum,
-  value: unknown
-) {
-  const item = questionAnswers.value.find(
-    item => item.questionId === questionId
-  );
-  if (questionType === QuestionTypeEnum.SHORT_ANSWER) {
-    item.answer = value;
-  } else {
-    item.options = value;
-  }
+  return item?.options ?? [];
 }
 
 function judgeQuestionAnswer(
@@ -80,14 +51,13 @@ function judgeQuestionAnswer(
   const item = questionAnswers.value.find(
     item => item.questionId === questionId
   );
-  if (questionType === QuestionTypeEnum.SHORT_ANSWER) {
-    return item.answer !== "";
+  if (!item) {
+    return false;
   }
-  return item.options.length !== 0;
-}
-
-function getStartTimeAndEndTime() {
-  endTime.value = dayjs().add(testPaperInfo.value.minute, "m");
+  if (questionType === QuestionTypeEnum.SHORT_ANSWER) {
+    return item?.answer !== "";
+  }
+  return item?.options?.length !== 0;
 }
 
 function computedDuration() {
@@ -100,46 +70,12 @@ function computedDuration() {
   }${seconds}秒`;
 }
 
-const submitExam = () => {
-  const hasEmpty = questionAnswers.value.some(item => {
-    if (item.answer === "" && item.options.length === 0) {
-      return true;
-    }
-  });
-
-  ElMessageBox.confirm(
-    hasEmpty ? "存在未填写的题目，是否提交？" : "确认要提交吗？",
-    {
-      confirmButtonText: "确定",
-      cancelButtonText: "取消"
-    }
-  ).then(() => {
-    handleSubmitExam();
-  });
-};
-const submitLoading = ref(false);
-const handleSubmitExam = async () => {
-  submitLoading.value = true;
-  const duration = endTime.value.diff(dayjs());
-
-  await submitTestPaper({
-    taskId: route.query.taskId,
-    testPaperId: route.query.testPaperId,
-    duration,
-    questionAnswers: questionAnswers.value
-  });
-  debugger;
-  submitLoading.value = false;
-  window.close();
-};
-
-getTaskTestPaperInfo(
+getTestPaperReadInfo(
   route.query.taskId as string,
   route.query.testPaperId as string
 ).then(({ data }) => {
-  testPaperInfo.value = data;
-  initQuestionAnswers(testPaperInfo.value.questionGroups);
-  getStartTimeAndEndTime();
+  testPaperInfo.value = data.testPaper;
+  answerInfo.value = data.answer;
 });
 onMounted(() => {
   timer.value = setInterval(() => {
@@ -159,8 +95,8 @@ onUnmounted(() => {
       <div class="exam-header-title-wrapper">
         <span class="exam-header-title">{{ testPaperInfo.title }}</span>
         <div>
-          <div>总分：{{ testPaperInfo.totalScore }}</div>
-          <div>时长：{{ testPaperInfo.minute }}分钟</div>
+          <div>得分：{{ testPaperInfo.totalScore }}</div>
+          <div>耗时：{{ testPaperInfo.minute }}分钟</div>
         </div>
       </div>
       <div class="exam-header-ddl">{{ durationTimeStr }}</div>
@@ -185,9 +121,7 @@ onUnmounted(() => {
               :is="components[question.type]"
               :question="question"
               :value="getQuestionValue(question.id, question.type)"
-              :onUpdateValue="
-                value => setQuestionValue(question.id, question.type, value)
-              "
+              readonly
             />
           </div>
         </div>
@@ -215,11 +149,6 @@ onUnmounted(() => {
               >{{ index + 1 }}</span
             >
           </div>
-        </div>
-        <div class="exam-main-right-bottom">
-          <el-button type="primary" :loading="submitLoading" @click="submitExam"
-            >提交试卷</el-button
-          >
         </div>
       </div>
     </div>
@@ -318,15 +247,6 @@ onUnmounted(() => {
           }
         }
       }
-    }
-
-    &-bottom {
-      position: absolute;
-      bottom: 16px;
-      display: flex;
-      width: 100%;
-      justify-content: center;
-      align-items: center;
     }
   }
 }
