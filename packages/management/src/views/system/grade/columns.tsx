@@ -4,7 +4,7 @@
  * @Version: 1.0
  * @LastEditors: @yzcheng
  * @Description: 
- * @LastEditTime: 2022-08-28 15:42:21
+ * @LastEditTime: 2022-09-03 23:58:19
  */
 import { ref } from "vue";
 import dayjs from "dayjs";
@@ -56,9 +56,9 @@ export function useColumns() {
     // },
     {
       label: "创建时间",
-      prop: "createTime",
-      formatter: ({ createTime }) =>
-        dayjs(createTime).format("YYYY-MM-DD HH:mm:ss")
+      prop: "createdDate",
+      formatter: ({ createdDate }) =>
+        dayjs(createdDate).format("YYYY-MM-DD HH:mm:ss")
     },
     // {
     //   label: "备注",

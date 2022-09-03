@@ -58,9 +58,9 @@ export function useColumns() {
     {
       label: "创建时间",
       width: 180,
-      prop: "createTime",
-      formatter: ({ createTime }) =>
-        dayjs(createTime).format("YYYY-MM-DD HH:mm:ss")
+      prop: "createdDate",
+      formatter: ({ createdDate }) =>
+        dayjs(createdDate).format("YYYY-MM-DD HH:mm:ss")
     },
     {
       label: "备注",
