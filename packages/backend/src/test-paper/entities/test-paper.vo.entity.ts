@@ -2,7 +2,8 @@ import { SubjectBaseVO } from '../../subject/entities/subject.vo.entity';
 import { QuestionGroupVO } from './question-group.vo.entity';
 import { UserVO } from '../../user/entities/user.vo.entity';
 import { ApiProperty } from '@nestjs/swagger';
-import { Expose } from 'class-transformer';
+import { Expose, Transform, Type } from 'class-transformer';
+import { Grade } from '../../grade/entities/grade.entity';
 
 export class TestPaperVO {
   id: string;
@@ -13,8 +14,14 @@ export class TestPaperVO {
 
   createdUser: UserVO;
 
+  @Type(() => Grade)
+  grade: Grade;
+
+  @Type(() => SubjectBaseVO)
   subject: SubjectBaseVO;
 
+  @Type(() => QuestionGroupVO)
+  @Transform(({ value }) => value.sort((a, b) => a.order - b.order))
   questionGroups: QuestionGroupVO[];
 
   @ApiProperty({
@@ -23,11 +30,15 @@ export class TestPaperVO {
   })
   @Expose()
   get totalScore() {
-    return this.questionGroups.reduce((total, groups) => {
-      return groups.questions.reduce((total, question) => {
-        return total + question.score;
-      }, total);
-    }, 0);
+    return this.questionGroups
+      ? this.questionGroups.reduce((total, groups) => {
+          return groups.questions
+            ? groups.questions.reduce((total, question) => {
+                return total + question.score;
+              }, total)
+            : total;
+        }, 0)
+      : 0;
   }
   set totalScore(value: number) {
     // fix

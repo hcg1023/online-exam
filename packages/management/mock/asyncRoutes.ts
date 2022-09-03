@@ -1,5 +1,6 @@
 // 根据角色动态生成路由
 import { MockMethod } from "vite-plugin-mock";
+import { IdentityEnum } from "/@/enums";
 
 // http://mockjs.com/examples.html#Object
 const systemRouter = {
@@ -113,6 +114,34 @@ const userRouter = {
   ]
 };
 
+const studentRouter = {
+  path: "/student",
+  meta: {
+    icon: "setting",
+    title: "menus.hssysManagement",
+    rank: 12
+  },
+  children: [
+    {
+      path: "/student/exam-write",
+      name: "ExamWrite",
+      meta: {
+        showLink: false,
+        icon: "expand",
+        title: "考试"
+      }
+    },
+    {
+      path: "/student/exam-list",
+      name: "ExamList",
+      meta: {
+        icon: "expand",
+        title: "考试列表"
+      }
+    }
+  ]
+};
+
 const permissionRouter = {
   path: "/permission",
   meta: {
@@ -218,16 +247,20 @@ export default [
     url: "/getAsyncRoutes",
     method: "get",
     response: ({ query }) => {
-      if (query.name === "admin") {
+      const identity = parseInt(query.identity);
+      if (identity === IdentityEnum.ADMIN) {
         return {
           code: 0,
           info: [
             userRouter,
-            // tabsRouter,
-            // frameRouter,
             systemRouter,
             setDifAuthority("v-admin", permissionRouter)
           ]
+        };
+      } else if (identity === IdentityEnum.STUDENT) {
+        return {
+          code: 0,
+          info: [studentRouter]
         };
       } else {
         return {

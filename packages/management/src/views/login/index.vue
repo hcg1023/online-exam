@@ -67,10 +67,11 @@ const onLogin = async (formEl: FormInstance | undefined) => {
         .loginByUsername(toRaw(ruleForm))
         .then(({ code }: responseData) => {
           if (code === 200) {
-            loading.value = false;
-            initRouter("admin").then(() => {});
-            message.success("登录成功");
-            router.push("/");
+            initRouter().then(() => {
+              loading.value = false;
+              message.success("登录成功");
+              router.push("/");
+            });
           }
         });
     } else {
@@ -226,7 +227,7 @@ dataThemeChange();
                 </el-button>
               </el-form-item>
             </Motion>
-            <!-- 
+            <!--
             <Motion :delay="300">
               <el-form-item>
                 <div class="w-full h-20px flex justify-between items-center">

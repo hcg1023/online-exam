@@ -1,4 +1,5 @@
 import {
+  ArrayMinSize,
   IsArray,
   IsEnum,
   IsInt,
@@ -6,9 +7,7 @@ import {
   IsOptional,
   IsString,
   Max,
-  MaxLength,
   Min,
-  MinLength,
   ValidateIf,
 } from 'class-validator';
 import { QuestionTypeEnum } from '../../enums';
@@ -33,11 +32,15 @@ function judgeOptionsIsRequired(obj: CreateQuestionDto) {
   ].includes(obj.type);
 }
 
+function judgeCorrectOptionsIsRequired(obj: CreateQuestionDto) {
+  return (
+    judgeOptionsIsRequired(obj) ||
+    [QuestionTypeEnum.REPLY_QUESTION].includes(obj.type)
+  );
+}
+
 function judgeAnsweIsRequired(obj: CreateQuestionDto) {
-  return [
-    QuestionTypeEnum.REPLY_QUESTION,
-    QuestionTypeEnum.SHORT_ANSWER,
-  ].includes(obj.type);
+  return [QuestionTypeEnum.SHORT_ANSWER].includes(obj.type);
 }
 
 export class CreateQuestionDto {
@@ -70,12 +73,12 @@ export class CreateQuestionDto {
   @IsArray()
   @IsNotEmpty()
   @Type(() => QuestionOptionDto)
-  @MinLength(2)
+  @ArrayMinSize(2)
   options?: QuestionOptionDto[];
 
-  @ValidateIf(judgeOptionsIsRequired)
+  @ValidateIf(judgeCorrectOptionsIsRequired)
   @IsArray()
-  @MinLength(1)
+  @ArrayMinSize(1)
   correctOptions?: string[];
 
   @ValidateIf(judgeAnsweIsRequired)

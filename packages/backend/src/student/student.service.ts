@@ -203,12 +203,13 @@ export class StudentService {
           }
           break;
         case QuestionTypeEnum.MULTIPLE_CHOICE:
+        case QuestionTypeEnum.REPLY_QUESTION:
           questionAnswerInstance.options = answerItem.options;
           const isEqual = judgeOptionsIsEqual(
             answerItem.options,
             question.correctOptions,
           );
-          // 多选题完全正确的情况，获得全部分数，否则由教师给分
+          // 多选题和填空题完全正确的情况，获得全部分数，否则由教师给分
           if (isEqual) {
             questionAnswerInstance.score = question.score;
             questionAnswerInstance.correctStatus = true;
@@ -216,7 +217,6 @@ export class StudentService {
             questionAnswerInstance.correctStatus = false;
           }
           break;
-        case QuestionTypeEnum.REPLY_QUESTION:
         case QuestionTypeEnum.SHORT_ANSWER:
           questionAnswerInstance.answer = answerItem.answer;
           if (answerItem.answer === question.answer) {

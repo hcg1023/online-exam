@@ -1,4 +1,5 @@
-import { IsNotEmpty, IsString, Length } from 'class-validator';
+import { IsEmpty, IsNotEmpty, IsString, Length } from 'class-validator';
+import { ApiHideProperty } from '@nestjs/swagger';
 
 export class CreateClassInfoDto {
   @IsNotEmpty()
@@ -9,4 +10,8 @@ export class CreateClassInfoDto {
   @IsNotEmpty()
   @IsString()
   grade: string;
+
+  @ApiHideProperty()
+  @IsEmpty()
+  createdUser: number;
 }

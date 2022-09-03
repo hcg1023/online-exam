@@ -3,11 +3,11 @@
  * @Date: 2022-08-27 13:46:33
  * @Version: 1.0
  * @LastEditors: @yzcheng
- * @Description: 
+ * @Description:
  * @LastEditTime: 2022-08-28 18:56:05
  */
 import App from "./App.vue";
-import router from "./router";
+import { router } from "./router";
 import { setupStore } from "/@/store";
 import ElementPlus from "element-plus";
 import { getServerConfig } from "./config";

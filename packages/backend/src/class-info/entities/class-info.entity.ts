@@ -32,6 +32,9 @@ export class ClassInfo {
   @OneToMany(() => User, (user) => user.classInfo)
   students: User[];
 
+  @ManyToOne(() => User)
+  createdUser: User;
+
   @CreateDateColumn()
   createdDate: Date;
 

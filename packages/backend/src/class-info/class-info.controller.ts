@@ -13,6 +13,8 @@ import {
 import { ClassInfoVO } from './entities/class-info.vo.entity';
 import { ListClassInfoDto } from './dto/list-class-info.dto';
 import { PaginatedVO } from '../common/paginated.vo.entity';
+import { RequestUser } from '../auth/user.decorator';
+import { UserVO } from '../user/entities/user.vo.entity';
 
 @ApiBearerAuth()
 @Roles(IdentityEnum.ADMIN)
@@ -23,14 +25,18 @@ export class ClassInfoController {
 
   @ApiBaseResponse(ClassInfoVO)
   @Post('create')
-  create(@Body() createClassInfoDto: CreateClassInfoDto) {
+  create(
+    @Body() createClassInfoDto: CreateClassInfoDto,
+    @RequestUser() user: UserVO,
+  ) {
+    createClassInfoDto.createdUser = user.id;
     return this.classInfoService.create(createClassInfoDto);
   }
 
   @Get('list')
   @ApiPaginatedResponse(ClassInfoVO)
-  async findAll(@Query() query: ListClassInfoDto) {
-    const [results, total] = await this.classInfoService.findAll(query);
+  async findAll(@Query() query: ListClassInfoDto, @RequestUser() user: UserVO) {
+    const [results, total] = await this.classInfoService.findAll(query, user);
     return new PaginatedVO<ClassInfoVO>({
       pageNo: query.pageNo,
       pageSize: query.pageSize,

@@ -12,6 +12,7 @@ import { QuestionGroup } from './question-group.entity';
 import { User } from '../../user/entities/user.entity';
 import { Subject } from '../../subject/entities/subject.entity';
 import { Answer } from '../../answer/entities/answer.entity';
+import { Grade } from '../../grade/entities/grade.entity';
 
 @Entity()
 export class TestPaper {
@@ -20,6 +21,9 @@ export class TestPaper {
 
   @Column()
   title: string;
+
+  @ManyToOne(() => Grade)
+  grade: Grade;
 
   // 允许多个试卷对应一个学科
   @ManyToOne(() => Subject)
