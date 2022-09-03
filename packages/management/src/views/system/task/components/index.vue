@@ -2,7 +2,7 @@
 import { useColumns } from "./columns";
 import type { responseData } from "/#/index";
 import { getTestPaperList } from "./services";
-import { FormInstance } from "element-plus";
+import { FormInstance, ElTable } from "element-plus";
 import { handleTree } from "@pureadmin/utils";
 import { reactive, ref, defineProps, onMounted } from "vue";
 import { TableProBar } from "/@/components/ReTable";
@@ -16,6 +16,10 @@ const props = defineProps({
   onSetSelection: {
     type: Function,
     default: () => () => {}
+  },
+  dataList: {
+    type: Array,
+    default: []
   }
 });
 const form = reactive({
@@ -28,7 +32,7 @@ let loading = ref(true);
 const { columns } = useColumns();
 
 const formRef = ref<FormInstance>();
-const tableRef = ref();
+const singleTableRef = ref<InstanceType<typeof ElTable>>();
 const visible = ref(false);
 const deptType = ref("");
 const deptId = ref("");
@@ -47,7 +51,7 @@ function handle(type: string, row: any) {
   }
 }
 function handleSelectionChange(val: any[]) {
-  props.onSetSelection(val)
+  props.onSetSelection(val);
 }
 
 async function onSearch() {
@@ -64,7 +68,6 @@ const resetForm = (formEl: FormInstance | undefined) => {
   formEl.resetFields();
   onSearch();
 };
-
 onMounted(() => {
   onSearch();
 });
@@ -81,12 +84,6 @@ onMounted(() => {
       <el-form-item label="试卷名称：" prop="user">
         <el-input v-model="form.name" placeholder="请输入试卷名称" clearable />
       </el-form-item>
-      <!-- <el-form-item label="状态：" prop="status">
-        <el-select v-model="form.status" placeholder="请选择状态" clearable>
-          <el-option label="开启" value="1" />
-          <el-option label="关闭" value="0" />
-        </el-select>
-      </el-form-item> -->
       <el-form-item>
         <el-button
           type="primary"
@@ -105,38 +102,20 @@ onMounted(() => {
         </el-button>
       </el-form-item>
     </el-form>
-
-    <TableProBar
-      title="试题列表"
-      :loading="loading"
-      :tableRef="tableRef?.getTableRef()"
-      :dataList="dataList"
-      @refresh="onSearch"
+    <el-table
+      ref="singleTableRef"
+      :data="dataList"
+      row-key="id"
+      default-expand-all
+      @selection-change="handleSelectionChange"
     >
-      <template #buttons> </template>
-      <template v-slot="{ size, checkList }">
-        <PureTable
-          ref="tableRef"
-          border
-          align="center"
-          row-key="id"
-          table-layout="auto"
-          default-expand-all
-          :size="size"
-          :data="dataList"
-          :columns="columns"
-          :checkList="checkList"
-          :header-cell-style="{
-            background: 'var(--el-table-row-hover-bg-color)',
-            color: 'var(--el-text-color-primary)'
-          }"
-          @selection-change="handleSelectionChange"
-        >
-          <template #difficulty="{ row }">
-            <el-rate disabled v-model="row.difficulty" />
-          </template>
-        </PureTable>
-      </template>
-    </TableProBar>
+      <el-table-column type="selection" width="50" />
+      <el-table-column type="index" width="50" />
+      <el-table-column property="subject.name" label="学科" />
+      <el-table-column property="title" label="试卷名称" />
+      <el-table-column property="minute" label="建议时间" />
+      <el-table-column property="minute" label="建议时间" />
+      <el-table-column property="totalScore" label="总分" />
+    </el-table>
   </div>
 </template>

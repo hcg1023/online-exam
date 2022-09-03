@@ -3,8 +3,8 @@
  * @Date: 2022-08-27 13:46:33
  * @Version: 1.0
  * @LastEditors: @yzcheng
- * @Description: 
- * @LastEditTime: 2022-09-03 18:50:29
+ * @Description:
+ * @LastEditTime: 2022-09-03 21:19:35
  */
 import { ref } from "vue";
 import dayjs from "dayjs";
@@ -14,7 +14,7 @@ export function useColumns() {
     {
       type: "selection",
       width: 55,
-      align: "left"
+      align: "left",
     },
     {
       label: "序号",
@@ -24,32 +24,36 @@ export function useColumns() {
       hide: ({ checkList }) => !checkList.includes("序号列")
     },
     {
-      label: "试题名称",
-      prop: "title",
-      width: 180,
+      label: "学科",
+      prop: "subject.name",
       align: "left"
     },
     {
-      label: "试题类型",
-      prop: "typeName",
-      width: 180,
+      label: "试卷名称",
+      prop: "title",
+      align: "left"
+    },
+    {
+      label: "建议时间",
+      prop: "minute",
+      align: "left"
+    },
+    {
+      label: "总分",
+      prop: "totalScore",
       align: "left"
     },
     {
       label: "创建时间",
-      width: 180,
       prop: "createdDate",
       formatter: ({ createdDate }) =>
         dayjs(createdDate).format("YYYY-MM-DD HH:mm:ss")
     },
     {
-      label: "总分",
-      prop: "score"
-    },
-    {
-      label: "难度",
-      prop: "difficulty",
-      slot: "difficulty"
+      label: "操作",
+      fixed: "right",
+      width: 140,
+      slot: "operation"
     }
   ]);
 

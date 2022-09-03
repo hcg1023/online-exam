@@ -4,7 +4,7 @@
  * @Version: 1.0
  * @LastEditors: @yzcheng
  * @Description: 试题 新增编辑
- * @LastEditTime: 2022-09-03 20:53:07
+ * @LastEditTime: 2022-09-03 22:10:30
 -->
 <template>
   <el-dialog
@@ -40,34 +40,67 @@
               </el-form-item>
             </el-col>
             <el-col :span="24">
-              <el-form-item label="试卷" prop="title">
-                <TableProBar
-                  title="试题列表"
-                  :loading="loadingTable"
-                  :tableRef="tableRef?.getTableRef()"
-                  :dataList="dataList"
-                >
-                  <template #buttons> </template>
-                  <template v-slot="{ size, checkList }">
-                    <PureTable
-                      ref="tableRef"
-                      border
-                      align="center"
-                      row-key="id"
-                      table-layout="auto"
-                      default-expand-all
-                      :size="size"
-                      :data="dataList"
-                      :columns="columns"
-                      :checkList="checkList"
-                      :header-cell-style="{
-                        background: 'var(--el-table-row-hover-bg-color)',
-                        color: 'var(--el-text-color-primary)'
-                      }"
-                      @selection-change="handleSelectionChange"
-                    />
-                  </template>
-                </TableProBar>
+              <el-form-item label="考试时间" prop="endDate">
+                <el-date-picker
+                  @change="setTaskTime"
+                  v-model="taskTime"
+                  type="datetimerange"
+                  start-placeholder="开始时间"
+                  end-placeholder="结束时间"
+                />
+              </el-form-item>
+            </el-col>
+            <el-col :span="24">
+              <el-form-item label="试卷">
+                <div style="color: #000; width: 100%; height: 100%">
+                  <TableProBar
+                    title="试卷列表"
+                    :loading="false"
+                    :tableRef="tableRef?.getTableRef()"
+                    :dataList="dataList"
+                  >
+                    <template #buttons> </template>
+                    <template v-slot="{ size, checkList }">
+                      <PureTable
+                        ref="tableRef"
+                        border
+                        align="center"
+                        row-key="id"
+                        table-layout="auto"
+                        default-expand-all
+                        :size="size"
+                        :data="dataList"
+                        :columns="columns"
+                        :checkList="checkList"
+                        :header-cell-style="{
+                          background: 'var(--el-table-row-hover-bg-color)',
+                          color: 'var(--el-text-color-primary)'
+                        }"
+                        @selection-change="handleSelectionChange"
+                      >
+                        <template #operation="{ row, index }">
+                          <el-popconfirm
+                            @confirm="handleDelete(index)"
+                            title="是否确认删除?"
+                          >
+                            <template #reference>
+                              <el-button
+                                class="reset-margin"
+                                link
+                                :loading="loading"
+                                type="primary"
+                                :size="size"
+                                :icon="useRenderIcon('delete')"
+                              >
+                                删除
+                              </el-button>
+                            </template>
+                          </el-popconfirm>
+                        </template></PureTable
+                      >
+                    </template>
+                  </TableProBar>
+                </div>
               </el-form-item>
             </el-col>
           </el-row>
@@ -110,7 +143,7 @@
       @close="handleCancel"
     >
       <div>
-        <paperComp v-if="paperVisible" :onSetSelection="setSelection" />
+        <paperComp v-if="paperVisible" :dataList="dataList" :onSetSelection="setSelection" />
         <div class="con-bottom">
           <el-button
             type="primary"
@@ -150,19 +183,17 @@ import { getGradeList } from "/@/api/system";
 import paperComp from "./components/index.vue";
 import type { FormInstance, FormRules } from "element-plus";
 import { words } from "lodash-unified";
-import { useColumns } from "./columns";
+import { useTaskColumns } from "./columns";
 import { handleTree } from "@pureadmin/utils";
+import dayjs from "dayjs";
 import { TableProBar } from "/@/components/ReTable";
 import { useRenderIcon } from "/@/components/ReIcon/src/hooks";
-let dataList = ref([]);
-let loadingTable = ref(true);
-const { columns } = useColumns();
+const dataList = ref([]);
+const { columns } = useTaskColumns();
 
 const formRef = ref<FormInstance>();
 const tableRef = ref();
 const visible = ref(false);
-const deptType = ref("");
-const deptId = ref("");
 const ruleFormRef = ref<FormInstance>();
 const radioDefaule = ref(null);
 const selectionList = ref([]);
@@ -187,6 +218,7 @@ const props = defineProps({
     default: () => () => {}
   }
 });
+const taskTime: any = ref([]);
 const dictionary = {
   add: "考试添加",
   edit: "考试更新"
@@ -220,32 +252,37 @@ const formatting = (item: any) => {
       break;
   }
 };
+
 // 表单数据
 const formState: any = reactive({
   title: "",
-  subject: "",
   grade: "",
-  minute: 0,
-  questionGroups: []
+  testPapers: [],
+  startDate: "",
+  endDate: ""
 });
+const handleDelete = (index: number) => {
+  formState.testPapers.splice(index, 1);
+  dataList.value.splice(index, 1);
+};
+const setTaskTime = (value: any) => {
+  const [startDate, endDate] = value;
+  formState.startDate = startDate?.getTime();
+  formState.endDate = endDate?.getTime();
+};
 const setSelection = (val: any) => {
   selectionList.value = val;
 };
 //添加一条标题
 const addQuestion = () => {
-  formState.questionGroups[paperIndex.value].questions =
-    selectionList.value.map((i: any) => i.id);
-  formState.questionGroups[paperIndex.value].questionList = selectionList.value;
+  dataList.value = selectionList.value;
+  formState.testPapers = selectionList.value.map((i: any) => i.id);
   paperVisible.value = false;
 };
 // 选择试题
 const addOptions = (index: number) => {
   paperVisible.value = true;
   paperIndex.value = index;
-};
-//删除一条标题
-const deleteOptions = (index: number) => {
-  formState.questionGroups.splice(index, 1);
 };
 // 校验
 const rules = reactive<FormRules>({
@@ -256,11 +293,11 @@ const rules = reactive<FormRules>({
       message: "考试是必传项"
     }
   ],
-  minute: [
+  endDate: [
     {
       required: true,
       trigger: "change",
-      message: "建议时间是必传项"
+      message: "结束时间是必传项"
     }
   ],
   grade: [
@@ -303,6 +340,9 @@ const updateRegulatory = async (data: any) => {
 };
 // 提交
 const onSubmit = async (formEl: FormInstance | undefined) => {
+  if (!formState.testPapers.length) {
+    message.error("请先选择试卷");
+  }
   if (!formEl) return;
   loading.value = true;
   await formEl.validate((valid, fields) => {
@@ -331,16 +371,15 @@ onMounted(async () => {
     if (res.code === 200) {
       formState["id"] = res.data["id"];
       formState["grade"] = res.data["grade"]?.id;
-      formState["subject"] = res.data["subject"]?.id;
       formState["title"] = res.data["title"];
-      formState["minute"] = res.data["minute"];
-      formState["questionGroups"] = res.data["questionGroups"].map(
-        (item: any) => {
-          item.questionList = item.questions;
-          item.questions = item.questions.map((i: any) => i.id);
-          return item;
-        }
-      );
+      formState["endDate"] = +dayjs(res.data["endDate"]);
+      formState["startDate"] = +dayjs(res.data["startDate"]);
+      formState["testPapers"] = res.data["testPapers"].map((i: any) => i.id);
+      dataList.value = res.data["testPapers"];
+      taskTime.value = [
+        +dayjs(res.data["startDate"]),
+        +dayjs(res.data["endDate"])
+      ];
     }
   }
 });
