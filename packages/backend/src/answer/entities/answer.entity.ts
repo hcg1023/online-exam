@@ -19,13 +19,17 @@ export class Answer {
   id: string;
 
   // 耗时
-  @Column()
+  @Column({
+    default: 0,
+  })
   duration: number;
 
   // 批改状态
   // 如果没有填空或者简答题，则一定是true，已批改
   // 有填空题或者简答题，则是false，等待教师批改完成改为true
-  @Column()
+  @Column({
+    default: false,
+  })
   correctStatus: boolean;
 
   // 考试，多个用户的答案可以对应一次考试

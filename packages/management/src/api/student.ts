@@ -18,3 +18,11 @@ export const getStudentTasks = (params?: object) => {
 export const getTaskTestPaperInfo = (taskId: string, testPaperId: string) => {
   return http.request("get", `/exam/${taskId}/${testPaperId}`);
 };
+
+export const getTestPaperReadInfo = (taskId: string, testPaperId: string) => {
+  return http.request("get", `/exam/answer/${taskId}/${testPaperId}`);
+};
+
+export const submitTestPaper = data => {
+  return http.request("post", "/exam/submit", { data });
+};

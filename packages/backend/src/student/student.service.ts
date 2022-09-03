@@ -189,6 +189,8 @@ export class StudentService {
           question: {
             id: answerItem.questionId,
           },
+          options: [],
+          answer: '',
         });
       switch (question.type) {
         case QuestionTypeEnum.SINGLE_CHOICE:
@@ -233,7 +235,9 @@ export class StudentService {
     const correctStatus = questionAnswers.every(
       (question) => question.correctStatus === true,
     );
-    await this.answerService.answersRepository.save({
+    const questionAnswersCreated =
+      await this.answerService.questionAnswerRepository.save(questionAnswers);
+    const newAnswer = this.answerService.answersRepository.create({
       testPaper: {
         id: testPaperId,
       },
@@ -243,11 +247,12 @@ export class StudentService {
       createdUser: {
         id: createdUserId,
       },
+      questionAnswers: questionAnswersCreated,
       duration,
-      questionAnswers,
       correctStatus,
     });
 
+    await this.answerService.answersRepository.save(newAnswer);
     return true;
   }
 

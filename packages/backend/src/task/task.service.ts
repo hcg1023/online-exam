@@ -77,7 +77,7 @@ export class TaskService {
   }
 
   async update(updateTaskDto: UpdateTaskDto) {
-    const { id, testPapers, grade } = updateTaskDto;
+    const { id, testPapers, grade, ...otherUpdateTask } = updateTaskDto;
     const oldTask = await this.tasksRepository.findOne({
       where: {
         id,
@@ -95,7 +95,8 @@ export class TaskService {
         this.testPaperService.testPapersRepository.create({ id }),
       );
     }
-    await this.tasksRepository.save(oldTask);
+    const newTask = this.tasksRepository.merge(oldTask, otherUpdateTask);
+    await this.tasksRepository.save(newTask);
     return this.findOne(updateTaskDto.id);
   }
 
