@@ -23,6 +23,7 @@ import { GradeVO } from './entities/grade.vo.entity';
 import { ListGradeDto } from './dto/list-grade.dto';
 import { SubjectBaseVO } from '../subject/entities/subject.vo.entity';
 import { PaginatedVO } from '../common/paginated.vo.entity';
+import { ClassInfoVO } from '../class-info/entities/class-info.vo.entity';
 
 @ApiBearerAuth()
 @ApiTags('Grade 年级')
@@ -53,6 +54,12 @@ export class GradeController {
   @ApiPaginatedResponse(SubjectBaseVO)
   getGradeSubjects(@Query() query: { id: string }) {
     return this.gradeService.getGradeSubjects(query.id);
+  }
+
+  @Get('classInfos')
+  @ApiPaginatedResponse(ClassInfoVO)
+  getGradeClassInfos(@Query() query: { id: string }) {
+    return this.gradeService.getGradeClassInfos(query.id);
   }
 
   @Get(':id')

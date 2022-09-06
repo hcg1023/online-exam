@@ -281,11 +281,12 @@ function judgeOptionsIsEqual(options: string[], corrects: string[]) {
   if (options.length === corrects.length) {
     const _options = options.slice().sort();
     const _corrects = corrects.slice().sort();
-    const index = 0;
+    let index = 0;
     while (index < _options.length) {
       if (_options[index] !== _corrects[index]) {
         return false;
       }
+      index++;
     }
     return true;
   }

@@ -44,12 +44,16 @@ export class UserService {
       grade: {
         id: createUserDto.grade,
       },
-      classInfo: {
-        id: createUserDto.classInfo,
-      },
-      createdUser: {
-        id: createUserDto.createdUser,
-      },
+      classInfo: createUserDto.classInfo
+        ? {
+            id: createUserDto.classInfo,
+          }
+        : null,
+      createdUser: createUserDto.createdUser
+        ? {
+            id: createUserDto.createdUser,
+          }
+        : null,
       password,
     });
     return this.findOne(user.id);

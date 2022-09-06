@@ -66,17 +66,17 @@ const systemRouter = {
         icon: "dept",
         title: "menus.hsDept"
       }
-    },
-    {
-      path: "/system/dict",
-      component: "/system/dict/index",
-      name: "Dict",
-      meta: {
-        icon: "dict",
-        title: "menus.hsDict",
-        keepAlive: true
-      }
     }
+    // {
+    //   path: "/system/dict",
+    //   component: "/system/dict/index",
+    //   name: "Dict",
+    //   meta: {
+    //     icon: "dict",
+    //     title: "menus.hsDict",
+    //     keepAlive: true
+    //   }
+    // }
   ]
 };
 const userRouter = {
@@ -262,8 +262,8 @@ export default [
           code: 0,
           info: [
             userRouter,
-            systemRouter,
-            setDifAuthority("v-admin", permissionRouter)
+            systemRouter
+            // setDifAuthority("v-admin", permissionRouter)
           ]
         };
       } else if (identity === IdentityEnum.STUDENT) {

@@ -29,6 +29,7 @@ dayjs.extend(duration); // 使用插件
 dayjs.locale("zh-cn");
 
 const testPaperInfo = ref();
+const startTime = ref();
 const endTime = ref();
 const timer = ref();
 const durationTimeStr = ref("");
@@ -87,6 +88,7 @@ function judgeQuestionAnswer(
 }
 
 function getStartTimeAndEndTime() {
+  startTime.value = dayjs();
   endTime.value = dayjs().add(testPaperInfo.value.minute, "m");
 }
 
@@ -120,7 +122,7 @@ const submitExam = () => {
 const submitLoading = ref(false);
 const handleSubmitExam = async () => {
   submitLoading.value = true;
-  const duration = endTime.value.diff(dayjs());
+  const duration = dayjs().diff(startTime.value);
 
   await submitTestPaper({
     taskId: route.query.taskId,
@@ -128,7 +130,6 @@ const handleSubmitExam = async () => {
     duration,
     questionAnswers: questionAnswers.value
   });
-  debugger;
   submitLoading.value = false;
   window.close();
 };

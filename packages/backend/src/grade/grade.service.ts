@@ -10,6 +10,7 @@ import { ListGradeDto } from './dto/list-grade.dto';
 import { getRepositoryPaginationParams } from '../common/paginated.dto';
 import { SubjectBaseVO } from '../subject/entities/subject.vo.entity';
 import { SubjectService } from '../subject/subject.service';
+import { ClassInfoBaseVO } from '../class-info/entities/class-info.vo.entity';
 
 @Injectable()
 export class GradeService {
@@ -56,6 +57,18 @@ export class GradeService {
       },
     });
     return plainToInstance(SubjectBaseVO, grade.subjects);
+  }
+
+  async getGradeClassInfos(id: string) {
+    const grade = await this.gradesRepository.findOne({
+      where: {
+        id,
+      },
+      relations: {
+        classInfos: true,
+      },
+    });
+    return plainToInstance(ClassInfoBaseVO, grade.classInfos);
   }
 
   async findOne(id: string) {

@@ -19,5 +19,5 @@ export const getStudentsList = (params?: object) => {
 };
 // 根据年级查询班级列表
 export const getClassInfo = (params?: object) => {
-  return http.request<Result>("get", "/grade/subjects", { params });
+  return http.request<Result>("get", "/grade/classInfos", { params });
 };

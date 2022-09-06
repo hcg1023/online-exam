@@ -61,7 +61,7 @@ function judgeQuestionAnswer(
 }
 
 function computedDuration() {
-  const diff = endTime.value.diff(dayjs());
+  const diff = answerInfo.value.duration;
   const hours = dayjs.duration(diff).hours();
   const minutes = dayjs.duration(diff).minutes();
   const seconds = dayjs.duration(diff).seconds();
@@ -76,16 +76,7 @@ getTestPaperReadInfo(
 ).then(({ data }) => {
   testPaperInfo.value = data.testPaper;
   answerInfo.value = data.answer;
-});
-onMounted(() => {
-  timer.value = setInterval(() => {
-    if (endTime.value) {
-      durationTimeStr.value = computedDuration();
-    }
-  }, 500);
-});
-onUnmounted(() => {
-  clearInterval(timer.value);
+  durationTimeStr.value = computedDuration();
 });
 </script>
 
@@ -95,11 +86,10 @@ onUnmounted(() => {
       <div class="exam-header-title-wrapper">
         <span class="exam-header-title">{{ testPaperInfo.title }}</span>
         <div>
-          <div>得分：{{ testPaperInfo.totalScore }}</div>
-          <div>耗时：{{ testPaperInfo.minute }}分钟</div>
+          <div>得分：{{ answerInfo.score }}/{{ testPaperInfo.totalScore }}</div>
+          <div>耗时：{{ durationTimeStr }}</div>
         </div>
       </div>
-      <div class="exam-header-ddl">{{ durationTimeStr }}</div>
     </div>
     <div class="exam-main">
       <div
