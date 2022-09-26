@@ -49,7 +49,7 @@ export const remainingPaths = Object.keys(remainingRouter)
   .map(v => {
     return remainingRouter[v].path;
   })
-  .concat("/student/exam-write");
+  .concat("/student/exam-write", "/answer/judge-exam", "/answer/view-exam");
 
 // 创建路由实例
 export const router: Router = createRouter({

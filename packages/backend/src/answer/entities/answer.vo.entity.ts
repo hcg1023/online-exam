@@ -59,7 +59,10 @@ export class AnswerVO {
   @Expose()
   get correctQuestionTotal() {
     return (
-      this.questionAnswers?.filter((answer) => answer.correctStatus).length ?? 0
+      this.questionAnswers?.filter(
+        (answer) =>
+          answer.correctStatus && answer.score === answer.question.score,
+      ).length ?? 0
     );
   }
   set correctQuestionTotal(num) {

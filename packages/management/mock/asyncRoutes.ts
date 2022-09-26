@@ -11,14 +11,6 @@ const systemRouter = {
     rank: 11
   },
   children: [
-    // {
-    //   path: "/system/role/index",
-    //   name: "Role",
-    //   meta: {
-    //     icon: "role",
-    //     title: "menus.hsRole"
-    //   }
-    // },
     {
       path: "/system/testPaper/index",
       name: "TestPaper",
@@ -67,51 +59,48 @@ const systemRouter = {
         title: "menus.hsDept"
       }
     }
-    // {
-    //   path: "/system/dict",
-    //   component: "/system/dict/index",
-    //   name: "Dict",
-    //   meta: {
-    //     icon: "dict",
-    //     title: "menus.hsDict",
-    //     keepAlive: true
-    //   }
-    // }
   ]
 };
-const userRouter = {
-  path: "/user",
-  meta: {
-    icon: "setting",
-    title: "menus.hsUser",
-    rank: 12
-  },
-  children: [
-    {
-      path: "/user/teachers/index",
-      name: "Teachers",
-      meta: {
-        icon: "flUser",
-        title: "menus.hsTeachers"
-      }
+const getUserRouter = (admin = false) => {
+  const result = {
+    path: "/user",
+    meta: {
+      icon: "setting",
+      title: "menus.hsUser",
+      rank: 12
     },
-    {
-      path: "/user/students/index",
-      name: "Students",
-      meta: {
-        icon: "role",
-        title: "menus.hsStudents"
+    children: [
+      {
+        path: "/user/students/index",
+        name: "Students",
+        meta: {
+          icon: "role",
+          title: "menus.hsStudents"
+        }
       }
-    },
-    {
-      path: "/user/administrator/index",
-      name: "Administrator",
-      meta: {
-        icon: "setting",
-        title: "menus.hsAdministrator"
+    ]
+  };
+  if (admin) {
+    result.children.push(
+      {
+        path: "/user/teachers/index",
+        name: "Teachers",
+        meta: {
+          icon: "flUser",
+          title: "menus.hsTeachers"
+        }
+      },
+      {
+        path: "/user/administrator/index",
+        name: "Administrator",
+        meta: {
+          icon: "setting",
+          title: "menus.hsAdministrator"
+        }
       }
-    }
-  ]
+    );
+  }
+  return result;
 };
 
 const studentRouter = {
@@ -177,35 +166,89 @@ const permissionRouter = {
   ]
 };
 
-const frameRouter = {
-  path: "/iframe",
+const teacherRouter = {
+  path: "/teacher",
   meta: {
-    icon: "monitor",
-    title: "menus.hsExternalPage",
-    rank: 10
+    icon: "setting",
+    title: "信息管理",
+    rank: 11
   },
   children: [
     {
-      path: "/iframe/pure",
-      name: "FramePure",
+      path: "/teacher/testPaper/index",
+      name: "TestPaper",
       meta: {
-        title: "menus.hsPureDocument",
-        frameSrc: "https://pure-admin-doc.vercel.app"
+        icon: "expand",
+        title: "menus.hsTestPaper"
       }
     },
     {
-      path: "/external",
-      name: "https://pure-admin-doc.vercel.app",
+      path: "/teacher/question/index",
+      name: "Question",
       meta: {
-        title: "menus.externalLink"
+        icon: "unExpand",
+        title: "menus.hsQuestion"
       }
     },
     {
-      path: "/iframe/ep",
-      name: "FrameEp",
+      path: "/teacher/task/index",
+      name: "Task",
       meta: {
-        title: "menus.hsEpDocument",
-        frameSrc: "https://element-plus.org/zh-CN/"
+        icon: "location-company",
+        title: "menus.hsTask"
+      }
+    },
+    {
+      path: "/teacher/dept/index",
+      name: "Dept",
+      meta: {
+        icon: "dept",
+        title: "menus.hsDept"
+      }
+    }
+  ]
+};
+
+const answerRouter = {
+  path: "/answer",
+  meta: {
+    icon: "setting",
+    title: "答卷管理",
+    rank: 11
+  },
+  children: [
+    {
+      path: "/answer/judgeList/index",
+      name: "judgeList",
+      meta: {
+        icon: "expand",
+        title: "批改列表"
+      }
+    },
+    {
+      path: "/answer/completeList/index",
+      name: "completeList",
+      meta: {
+        icon: "expand",
+        title: "答卷列表"
+      }
+    },
+    {
+      path: "/answer/judge-exam",
+      name: "judgeExam",
+      meta: {
+        icon: "expand",
+        showLink: false,
+        title: "批改试卷"
+      }
+    },
+    {
+      path: "/answer/view-exam",
+      name: "viewExam",
+      meta: {
+        showLink: false,
+        icon: "expand",
+        title: "查看试卷"
       }
     }
   ]
@@ -261,10 +304,15 @@ export default [
         return {
           code: 0,
           info: [
-            userRouter,
+            getUserRouter(true),
             systemRouter
             // setDifAuthority("v-admin", permissionRouter)
           ]
+        };
+      } else if (identity === IdentityEnum.TEACHER) {
+        return {
+          code: 0,
+          info: [getUserRouter(false), teacherRouter, answerRouter]
         };
       } else if (identity === IdentityEnum.STUDENT) {
         return {

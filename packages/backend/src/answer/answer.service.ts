@@ -43,7 +43,7 @@ export class AnswerService {
   async findCorrectionTestPaperList(
     query: GetWaitingForCorrectionTestPaperListDto,
     correctStatus: boolean,
-  ) {
+  ): Promise<[TeacherTestPaperVO[], number]> {
     const [list, total] = await this.answersRepository.findAndCount({
       where: {
         correctStatus,
@@ -64,6 +64,9 @@ export class AnswerService {
             }
           : null,
       },
+      order: {
+        createdDate: 'DESC',
+      },
       relations: {
         createdUser: {
           grade: true,
@@ -75,7 +78,10 @@ export class AnswerService {
             questions: true,
           },
         },
-        questionAnswers: true,
+        questionAnswers: {
+          question: true,
+        },
+        task: true,
       },
       ...getRepositoryPaginationParams(query),
     });
@@ -91,6 +97,7 @@ export class AnswerService {
       testPaper.correctQuestionTotal = answerVo.correctQuestionTotal;
       testPaper.duration = answerGroup.duration;
       testPaper.submitTime = answerGroup.createdDate;
+      testPaper.task = answerGroup.task;
       return testPaper;
     });
     return [result, total];
@@ -174,15 +181,17 @@ export class AnswerService {
         id: answerId,
       },
       relations: {
-        questionAnswers: true,
+        questionAnswers: {
+          question: true,
+        },
       },
     });
     const newQuestionAnswers = answer.questionAnswers.map((questionAnswer) => {
       if (questionAnswer.correctStatus) {
-        return;
+        return questionAnswer;
       }
       questionAnswer.score = questionAnswers.find(
-        (item) => item.id === questionAnswer.id,
+        (item) => item.id === questionAnswer.question.id,
       ).score;
       questionAnswer.correctStatus = true;
       questionAnswer.correctTeacher = this.userService.usersRepository.create({

@@ -1,44 +1,48 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-  Query,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Query } from '@nestjs/common';
 import { AnswerService } from './answer.service';
-import { CreateAnswerDto } from './dto/create-answer.dto';
-import { UpdateAnswerDto } from './dto/update-answer.dto';
-import { ApiBearerAuth, ApiExcludeController, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { GetWaitingForCorrectionTestPaperListDto } from './dto/get-waiting-for-correction-test-paper-list.dto';
 import { JudgeAnswerDto } from './dto/judge-answer.dto';
 import { RequestUser } from '../auth/user.decorator';
 import { UserVO } from '../user/entities/user.vo.entity';
+import { PaginatedVO } from '../common/paginated.vo.entity';
+import { TeacherTestPaperVO } from './entities/teacher-test-paper.vo.entity';
 
 @ApiBearerAuth()
 @ApiTags('Answer')
-@ApiExcludeController()
 @Controller('answer')
 export class AnswerController {
   constructor(private readonly answerService: AnswerService) {}
 
-  @Get('/answer/judgeList')
-  findWaitingForCorrectionTestPaperList(
+  @Get('/judgeList')
+  async findWaitingForCorrectionTestPaperList(
     @Query() query: GetWaitingForCorrectionTestPaperListDto,
   ) {
-    return this.answerService.findWaitingForCorrectionTestPaperList(query);
+    const [results, total] =
+      await this.answerService.findWaitingForCorrectionTestPaperList(query);
+    return new PaginatedVO<TeacherTestPaperVO>({
+      pageNo: query.pageNo,
+      pageSize: query.pageSize,
+      total,
+      results,
+    });
   }
 
-  @Get('/answer/completeList')
-  findCorrectedTestPaperList(
+  @Get('/completeList')
+  async findCorrectedTestPaperList(
     @Query() query: GetWaitingForCorrectionTestPaperListDto,
   ) {
-    return this.answerService.findCorrectedTestPaperList(query);
+    const [results, total] =
+      await this.answerService.findCorrectedTestPaperList(query);
+    return new PaginatedVO<TeacherTestPaperVO>({
+      pageNo: query.pageNo,
+      pageSize: query.pageSize,
+      total,
+      results,
+    });
   }
 
-  @Get('/:taskId/testPaperId/:userId')
+  @Get('/:taskId/:testPaperId/:userId')
   getTestPaperAndAnswer(
     @Param('taskId') taskId: string,
     @Param('testPaperId') testPaperId: string,
